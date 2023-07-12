@@ -1,16 +1,9 @@
 CC="gcc"
-all:a.exe
+all:停车管理系统.exe
 
-obj-y=hello.oright.omain.c
 
-a.exe:obj-y
-	$(CC)-o$@$^
-
-hello.o:hello.c
-	$(CC)-o$@-c$<
-
-right.o:right.c
-	$(CC)-o$@-c$<
+# right.o:right.c
+# 	$(CC)-o$@-c$<
 
 clean:
 	rm-f*.o

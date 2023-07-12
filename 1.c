@@ -10,27 +10,33 @@ int user_len = 6; //用户名长度
 int paswd_len = 6; //密码长度
 int NOW = 0; //程序状态判断
 int *init_con = NULL; //初始化变量存储位置
-int n = 100; //停车场车位
+int c_num = 100; //停车场车位
 int ten_mun; //十分钟的价钱
 int hfh_mun; //半小时的价钱
 int hou_mun; //一小时的价钱
 
-int nn = 100; // 会员数量
+int p_num = 100; // 会员数量
 
 typedef struct
 {
-    char*peo,*car; //人名、车牌号
-    bool V; //会员
-    double vue;
+    char*peo; //人名
+    struct 
+    {
+        char* nm;
+        time_t nx_t, now_t;//上次走的时间，这次来的时间
+    }* car;
+    int c_num;//车辆数量
+    int V; //已停时长
+    double vue; //账号余额
     struct 
     {
         int x, y;
-    }wer;
-}mess;
+    }wer;//车辆位置
+}MESS;
 
 
 bool IsRight(); //密码判断，返回0或1；
-void init_sys(char**plc); //初始化系统
+void init_sys(char**plc, MESS *peo); //初始化系统
 int read_f_num(FILE*fp); //读取配置文件中的数字，
 void He_init(); //hello界面
 
@@ -52,16 +58,12 @@ int main()
     //IsRight();
     //He_init();
     char**park;
-    init_sys(park);
+    MESS *xxx;
+    init_sys(park, xxx);
     return 0;
 }
 
-void Car_Com()
-{
-
-}
-
-int read_f_num(FILE*fp)
+int read_f_num(FILE* fp)
 {
     char s[100];
     int num=0;
@@ -87,36 +89,45 @@ int read_f_num(FILE*fp)
     return num;
 }
 
-void init_sys(char**plc)
+void init_sys(char** plc, MESS* peo)
 {
     FILE * sys = NULL;
-    if((sys = fopen(".\\data\\system", "r")) == NULL)
-    {
-        printf("Can not open data file system\n");
-        exit(0);
-    }
-    init_con = (int*)malloc(sizeof(int)*PZ_NUM);
-    for(int i = 0; i < PZ_NUM; i++)
-    {
-        init_con[i] = read_f_num(sys);
-    }
-    user_len = init_con[0];
-    paswd_len = init_con[1];
-    n = init_con[2];
-    ten_mun = init_con[3];
-    hfh_mun = init_con[4];
-    hou_mun = init_con[5];
-    // printf("%d\n",user_len);
-    fclose(sys); // 配置信息读完
+    // 读取基础配置文件
+    // if((sys = fopen(".\\data\\system", "r")) == NULL)
+    // {
+    //     printf("Can not open data file system\n");
+    //     exit(0);
+    // }
+    // init_con = (int*)malloc(sizeof(int)*PZ_NUM);
+    // for(int i = 0; i < PZ_NUM; i++)
+    // {
+    //     init_con[i] = read_f_num(sys);
+    // }
+    // user_len = init_con[0];
+    // paswd_len = init_con[1];
+    // c_num = init_con[2];
+    // ten_mun = init_con[3];
+    // hfh_mun = init_con[4];
+    // hou_mun = init_con[5];
+    // // printf("%d\n",user_len);
+    // fclose(sys); // 配置信息读完
 
+    peo = (MESS*)malloc(sizeof(MESS) * p_num);
     if((sys = fopen(".\\data\\usr_p", "r")) == NULL)
     {
         printf("Can not open data file usr_p\n");
         exit(0);
     }
     int i = 0;
-    while(fscanf(sys, "%s %d", s, &a) != EOF)
-    {}
+    // while(fscanf(sys, "%s %s %d %d %llf %d %d", peo[i].peo, peo[i].car.nm, &peo[i].car.nx_t, &peo[i].car.now_t, &peo[i].V, &peo[i].vue, &peo[i].wer.x, &peo[i].wer.y) != EOF)
+    // {
+    //     i++;
+    // }
+    int len = i; i = 0;
+    for(i = 0; i < len; i++)
+    {
+        // printf("用户名：%s 车名：%s 上次来的时间：%d 这次来的时间（不在停车场时间为0）：%d 已停时长：%d  账户余额：%llf 位置x：%d 位置y：%d", peo[i].peo, peo[i].car.nm, peo[i].car.nx_t, peo[i].car.now_t, peo[i].V, peo[i].vue, peo[i].wer.x, peo[i].wer.y); //读取 用户名 车名 上次来的时间 这次来的时间（不在停车场时间为0） 已停时长 账户余额 位置x 位置y
+    }
 }
 
 void He_init()
@@ -257,7 +268,7 @@ bool IsRight()
     user_paswd = (char*)malloc(paswd_len*sizeof(char));
     if((fp = fopen(".\\data\\user_file","r")) == NULL)
     {
-        printf("Cannotopenwritefile\n");
+        printf("Cap_numotopenwritefile\n");
         exit(0);
     }
     char* name,* paswd;

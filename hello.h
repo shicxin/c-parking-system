@@ -1,12 +1,12 @@
-#ifndef__HELLOSCX__
-#define__HELLOSCX__
+#ifndef __HELLOSCX__
+#define __HELLOSCX__
 #include<stdio.h>
 #include<stdlib.h>
 
-intuser_len=6;//用户名长度
-intpaswd_len=6;//密码长度
-intNOW=0;//程序状态判断
-voidHe_init();//hello界面
+int user_len = 6;//用户名长度
+int paswd_len = 6;//密码长度
+int NOW = 0;//程序状态判断
+void He_init();//hello界面
 
 
 #endif

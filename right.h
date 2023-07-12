@@ -1,7 +1,7 @@
-#ifndef__RIGHT__
-#define__RIGHT__
+#ifndef __RIGHT__
+#define __RIGHT__
 
-intIsRight();//密码判断，返回0或1；
+int IsRight();//密码判断，返回0或1；
 
 
 #endif
