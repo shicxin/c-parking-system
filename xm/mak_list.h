@@ -1,7 +1,15 @@
 #ifndef __MAK_LIST__
 #define __MAK_LIST__
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 #include<stdbool.h>
 #include<time.h>
+#include"hello.h"//界面函数
+#include"right.h"//复杂的正误判断函数
+// #include"mak_list.h"//程序数据函数
+#include"sys.h"//系统设置函数
+#include"money.h"//账目统计相关函数
 
 typedef struct 
 {
@@ -15,6 +23,7 @@ typedef struct
 typedef struct
 {
     char p_n[5]; //人名
+    char mima[20];
     // CAR* car; //名下车辆信息
     // int c_num;//车辆数量
     int V; //已结账时长

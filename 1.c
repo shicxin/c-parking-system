@@ -4,63 +4,500 @@
 #include<stdbool.h>
 #include<time.h>
 
-#define PZ_NUM 6      //é…ç½®æ–‡ä»¶æ¡ç›®æ•°é‡
+#define PZ_NUM 6      //ÅäÖÃÎÄ¼şÌõÄ¿ÊıÁ¿
 
-int user_len = 6; //ç”¨æˆ·åé•¿åº¦
-int paswd_len = 6; //å¯†ç é•¿åº¦
-int NOW = 0; //ç¨‹åºçŠ¶æ€åˆ¤æ–­
-int *init_con = NULL; //åˆå§‹åŒ–å˜é‡å­˜å‚¨ä½ç½®
-int c_num = 100; //åœè½¦åœºè½¦ä½
-int ten_mun; //ååˆ†é’Ÿçš„ä»·é’±
-int hfh_mun; //åŠå°æ—¶çš„ä»·é’±
-int hou_mun; //ä¸€å°æ—¶çš„ä»·é’±
+//DATA
 
-int p_num = 100; // ä¼šå‘˜æ•°é‡
+int user_len = 6; //ÓÃ»§Ãû³¤¶È
+int paswd_len = 6; //ÃÜÂë³¤¶È
+int NOW = 0; //³ÌĞò×´Ì¬ÅĞ¶Ï
+int *init_con = NULL; //³õÊ¼»¯±äÁ¿´æ´¢Î»ÖÃ
+int c_num = 100; //Í£³µ³¡³µÎ»
+int ten_mun; //Ê®·ÖÖÓµÄ¼ÛÇ®
+int hfh_mun; //°ëĞ¡Ê±µÄ¼ÛÇ®
+int hou_mun; //Ò»Ğ¡Ê±µÄ¼ÛÇ®
 
-typedef struct
-{
-    char*peo; //äººå
-    struct 
-    {
-        char* nm;
-        time_t nx_t, now_t;//ä¸Šæ¬¡èµ°çš„æ—¶é—´ï¼Œè¿™æ¬¡æ¥çš„æ—¶é—´
-    }* car;
-    int c_num;//è½¦è¾†æ•°é‡
-    int V; //å·²åœæ—¶é•¿
-    double vue; //è´¦å·ä½™é¢
-    struct 
-    {
+int p_num = 100; // »áÔ±ÊıÁ¿
+
+bool chang[101] = {1};
+
+typedef struct CAR{
+    char nm[10];
+    time_t nx_t, now_t; //ÉÏ´Î×ßµÄÊ±¼ä£¬Õâ´ÎÀ´µÄÊ±¼ä
+    struct {
         int x, y;
-    }wer;//è½¦è¾†ä½ç½®
-}MESS;
+    }wer; //³µÁ¾Î»ÖÃ
+}CAR;
+
+typedef struct MESS{
+    char p_n[10]; //ÈËÃû```````
+    char mima[20];
+    int V; //ÒÑ½áÕËÊ±³¤
+    double vue; //ÕËºÅÓà¶î
+    struct MESS* nxt;
+}MESS; //ÕË»§
+
+typedef struct CHA{
+    CAR car;
+    struct CHA* nxt;
+}CHA; //Í£³µ³¡
+
+CHA cha;
+MESS peo;
 
 
-bool IsRight(); //å¯†ç åˆ¤æ–­ï¼Œè¿”å›0æˆ–1ï¼›
-void init_sys(char**plc, MESS *peo); //åˆå§‹åŒ–ç³»ç»Ÿ
-int read_f_num(FILE*fp); //è¯»å–é…ç½®æ–‡ä»¶ä¸­çš„æ•°å­—ï¼Œ
-void He_init(); //helloç•Œé¢
+// DODODO
 
-void Car_Com(); //è½¦æ¥äº†ï¼Œéœ€è¦è½¦ç‰Œå·ï¼Œä¼šä¸ºè½¦ç‰Œå·åˆ†é…å¯¹åº”çš„åœè½¦ä½
-void Car_Out(); //è½¦èµ°äº†
-void Car_Wer(); //è½¦åœ¨å“ª
-void Set_sys(); //è®¾ç½®ç³»ç»Ÿ
+void init_sys(MESS*, CHA*); //³õÊ¼»¯ÏµÍ³
+void Set_sys(CHA*); //ÉèÖÃÏµÍ³
+
+bool Mak_Di_chang(MESS*, char*);//ĞÂ½¨ÓÃ»§
+bool Init_Di_chang(FILE*, MESS*);
+// MESS* Del_Di_chang(MESS*);//É¾³ıÓÃ»§
+bool Fnd_di_chang_us_pnm(MESS*, char*);//Ñ°ÕÒÁ´½Úµã
+
+bool Mak_Di_car(CHA*);//Ä£Äâ³µÀ´Í£³µ³¡
+bool Del_Di_car(CHA*, char*);//Ä£Äâ³µ³öÍ£³µ³¡
+void look_list_mess(MESS*);//±éÀúÓÃ»§Á´±í
+
+bool IsRight(); //ÃÜÂëÅĞ¶Ï£¬·µ»Ø0»ò1£»
+int read_f_num(FILE*); //¶ÁÈ¡ÅäÖÃÎÄ¼şÖĞµÄÊı×Ö£¬
+void He_init(); //hello½çÃæ
+
+void Car_Com(CHA*); //³µÀ´ÁË£¬ĞèÒª³µÅÆºÅ£¬»áÎª³µÅÆºÅ·ÖÅä¶ÔÓ¦µÄÍ£³µÎ»
+void Car_Out(CHA*, MESS*); //³µ×ßÁË
+void Car_Wer(CHA*); //³µÔÚÄÄ
+void Chang_car(CAR*);//ÎªĞÂÀ´µÄ³µ·ÖÅä³µÎ»
+int Fnd_chang();//ÕÒµ½¿Õ³µÎ»£¬·µ»Ø³µÎ»µÄ³éÏó¿Õ¼ä
 
 
-//
 int main()
 {
-    //while(NOW != 100)
-    //{
-        //He_init();
-    //}
-    //puts("æ¬¢è¿ç®¡ç†å‘˜");
-    //system("pause");
-    //IsRight();
-    //He_init();
-    char**park;
-    MESS *xxx;
-    init_sys(park, xxx);
+    MESS p; CHA q;
+    p.nxt = NULL;
+    q.nxt = NULL;
+    init_sys(&p, &q);
+    // while(NOW != 100)
+    // {
+    //     He_init();
+    // }
+    // return 0;
+}
+
+void init_sys(MESS* peo, CHA* cha)
+{
+    FILE * sys = NULL;
+    // ¶ÁÈ¡»ù´¡ÅäÖÃÎÄ¼ş
+    if((sys = fopen(".\\data\\system", "r")) == NULL)
+    {
+        printf("Can not open data file system\n");
+        exit(0);
+    }
+    init_con = (int*)malloc(sizeof(int)*PZ_NUM);
+    char c[100];
+    for(int i = 0; i < PZ_NUM; i++)
+    {
+        fscanf(sys, "%s %d", c,&init_con[i]);
+    }
+    user_len = init_con[0];
+    paswd_len = init_con[1];
+    c_num = init_con[2];
+    ten_mun = init_con[3];
+    hfh_mun = init_con[4];
+    hou_mun = init_con[5];
+    system("cls");
+    puts("******µ±Ç°ÏµÍ³ÅäÖÃĞÅÏ¢ÈçÏÂ£º*******");
+    printf("**¹ÜÀíÔ±ÕËºÅ³¤¶ÈÎª%d, ÃÜÂë³¤¶ÈÎª%d **\n",user_len, paswd_len);
+    printf("********ÏÖÔÚÍ£³µ³¡´óĞ¡Îª£º%d *****\n", c_num);
+    printf("*******Í£³µÃ¿Ê®·ÖÖÓµÄ¼Û¸ñÎª£º%d  ***\n", ten_mun);
+    printf("*******Í£³µÃ¿°ëĞ¡Ê±µÄ¼Û¸ñÎª£º%d  ***\n", hfh_mun);
+    printf("*******Í£³µÃ¿Ò»Ğ¡Ê±µÄ¼Û¸ñÎª£º%d ***\n", hou_mun);
+    puts("***********************************");
+    puts("************0.ĞŞ¸Ä*****************");
+    puts("*****x.ÊäÈÎÒâÊıÖ±½Ó½øÈëÏµÍ³********");
+    puts("***********************************");
+    printf("*********ÇëÊäÈë£º  ****************\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+    int k = 0;
+    scanf("%d", &k);
+    if(k == 0)
+    {}
+    puts("ÏµÍ³ÉèÖÃÍê³É");
+    fclose(sys); 
+    // ÅäÖÃĞÅÏ¢ÉèÖÃÍê
+    //¿ªÊ¼³õÊ¼»¯ÏµÍ³
+    if((sys = fopen(".\\data\\usr_p", "r")) == NULL)
+    {
+        printf("Can not open data file usr_p\n");
+        system("pause");
+        return;
+    }
+    int len = 0, i = 0;
+    peo->nxt = NULL;
+    Init_Di_chang(sys, peo);
+    // look_list_mess(peo);
+    for(i = 0; i < len; i++)
+    {
+        // printf("ÓÃ»§Ãû£º%s ³µÃû£º%s ÉÏ´ÎÀ´µÄÊ±¼ä£º%d Õâ´ÎÀ´µÄÊ±¼ä£¨²»ÔÚÍ£³µ³¡Ê±¼äÎª0£©£º%d ÒÑÍ£Ê±³¤£º%d  ÕË»§Óà¶î£º%llf Î»ÖÃx£º%d Î»ÖÃy£º%d", peo[i].peo, peo[i].car.nm, peo[i].car.nx_t, peo[i].car.now_t, peo[i].V, peo[i].vue, peo[i].wer.x, peo[i].wer.y); //¶ÁÈ¡ ÓÃ»§Ãû ³µÃû ÉÏ´ÎÀ´µÄÊ±¼ä Õâ´ÎÀ´µÄÊ±¼ä£¨²»ÔÚÍ£³µ³¡Ê±¼äÎª0£© ÒÑÍ£Ê±³¤ ÕË»§Óà¶î Î»ÖÃx Î»ÖÃy
+    }
+}
+
+bool Init_Di_chang(FILE* fp, MESS* q)
+{
+    q->nxt = (MESS*)malloc(sizeof(MESS));
+    q = q->nxt;
+    q->nxt = NULL;
+    char s1[10], s2[10];
+    double a; int b;
+    while(fscanf(fp, "%s %s %lf %d", s1, s2, &a, &b) != EOF)// q->p_n, q->mima, q->vue, q->V) != EOF)
+    {
+        // printf("ÄãµÄÃû×ÖÊÇ%s \nÄãµÄÃÜÂëÊÇ%s \nÄãµÄÓà¶îÎª%lf\nÄãÒÑ¾­Ê¹ÓÃÊ±³¤Îª%d\n", s1, s2, a, b);
+        strcpy(q->p_n, s1);
+        strcpy(q->mima, s2);
+        q->vue = a;
+        q->V = b;
+        // printf("ÄãµÄÃû×ÖÊÇ%s \nÄãµÄÃÜÂëÊÇ%s \nÄãµÄÓà¶îÎª%lf\nÄãÒÑ¾­Ê¹ÓÃÊ±³¤Îª%d\n",q->p_n, q->mima, q->vue, q->V);
+        q->nxt = (MESS*)malloc(sizeof(MESS));
+        q = q->nxt;
+        q->nxt = NULL;
+        system("pause");
+    }
+    return 1;
+}
+
+void He_init()
+{
+    int c;
+    if(NOW <= -3)
+    {
+        system("cls");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        puts("±¬Õ¨±¬Õ¨±¬Õ¨ÃÜÂë´íÎó±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨±¬Õ¨");
+        NOW = 100;
+        return;
+    }
+    else if(NOW ==0)
+    {
+        system("cls");
+        puts("***********************************");
+        puts("***********0.ÇëµÇÂ¼****************");
+        puts("***********1.ÍË³ö******************");
+        puts("***********************************");
+        printf("ÇëÑ¡Ôñ³ÌĞò¹¦ÄÜ£º");
+        scanf("%d",&c);
+        if(c==0)//µÇÂ¼
+        {
+            if(IsRight() != 1)
+            {
+                puts("ÃÜÂë´íÎó");
+                system("pause");
+                //system("pause");
+            }
+            else
+            {
+                puts("»¶Ó­¹ÜÀíÔ±");
+                system("pause");
+            }
+        }
+        else if(c==1)
+        {
+            NOW=100;
+        }
+        else
+        {
+            puts("ÊäÈë¸ñÊ½ÓĞÎÊÌâ");
+            system("pause");
+        }
+    }
+    else if(NOW<0)
+    {
+        system("cls");
+        puts("*******ÃÜÂë´íÎóÈı´Î½«±¬Õ¨***********");
+        puts("***********0.ÇëµÇÂ¼****************");
+        puts("***********0.ÇëµÇÂ¼****************");
+        puts("***********ÃÜÂë´íÎó****************");
+        printf("***********ÒÑ´íÎó%d´Î***************\n",-NOW);
+        printf("ÇëÑ¡Ôñ³ÌĞò¹¦ÄÜ£º");
+        scanf("%d",&c);
+        if(c==0)//µÇÂ¼
+        {
+            if(IsRight()==0)
+            {
+                puts("ÃÜÂë´íÎó");
+                system("pause");
+            }
+            else
+            {
+                puts("»¶Ó­¹ÜÀíÔ±");
+                system("pause");
+            }
+        }
+        else
+        {
+            puts("ÊäÈëÓĞÎÊÌâ");
+            system("pause");
+        }
+    }
+    else
+    {
+        system("cls");
+        puts("**********************************");
+        puts("*************0.¿¨ÄÚ³äÖµ***********");
+        puts("*************1.Í£³µ***************");
+        puts("*************2.È¡³µ***************");
+        puts("*************3.²é³µÔÚÄÄ***********");
+        puts("*************4.ÍË³ö***************");
+        puts("*************5.ÍË³ö³ÌĞò***********");
+        puts("*************6.ÅäÖÃÏµÍ³***********");
+        puts("**********************************");
+        printf("ÇëÑ¡Ôñ³ÌĞò¹¦ÄÜ£º");
+        scanf("%d",&c);
+        if(c == 0)//½áÕË
+        {}
+        else if(c == 1)//³µÀ´
+        {
+            Car_Com(&cha);
+        }
+        else if(c == 2)//³µ×ß
+        {
+            Car_Out(&cha, &peo);
+        }
+        else if(c == 3)//³µÔÚÄÄ
+        {
+            Car_Wer(&cha);
+        }
+        else if(c == 4)//ÍË³öµÇÂ¼
+        {
+            NOW = 0;
+        }
+        else if(c == 5)//ÍË³ö³ÌĞò
+        {
+            NOW = 100;
+        }
+        // else if(c == 6)
+        // {
+        //     Set_sys();
+        // }
+        else
+        {
+            puts("ÊäÈëÓĞÎÊÌâ");
+            system("pause");
+        }
+    } 
+}
+
+bool IsRight()
+{
+    bool key = 0;
+    FILE* fp;
+    char* user_name,* user_paswd;
+    user_name = (char*)malloc(user_len*sizeof(char));
+    user_paswd = (char*)malloc(paswd_len*sizeof(char));
+    if((fp = fopen(".\\data\\user_file","r")) == NULL)
+    {
+        printf("Cap_numotopenwritefile\n");
+        exit(0);
+    }
+    char* name,* paswd;
+    name = (char*)malloc(100*sizeof(char));
+    paswd = (char*)malloc(100*sizeof(char));
+    puts("ÇëÊäÈëÓÃ»§Ãû£º");
+    scanf("%s", name);
+    puts("ÇëÊäÈëÃÜÂë£º");
+    scanf("%s", paswd);
+    fgets(user_name, user_len, fp);
+    fgets(user_paswd, paswd_len, fp);
+
+    if(strcmp(paswd, user_paswd)==0&&strcmp(name, user_name)==0)key=1;
+    else key=0;
+
+    free(name);
+    free(user_name);
+    free(paswd);
+    free(user_paswd);
+    fclose(fp);
+    key==0?(NOW--):(NOW=1);
+
+    return key;
+}
+
+void Car_Com(CHA* q)
+{
+    if(Mak_Di_car(q) == 1)
+    {
+        puts("ÄãµÄ³µÒÔÈë¿â£¡");
+    }
+    else puts("ÓĞÎÊÌâ");
+}
+
+bool Mak_Di_car(CHA* q)
+{
+    CHA* p;
+    if((p = (CHA*)malloc(sizeof(CHA))) == NULL)
+    {
+        puts("Malloc over wen make LIST!!!");
+        return 0;
+    }
+    printf("ÇëÊäÈëÄãµÄ³µÅÆºÅ£º");
+    scanf("%s", p->car.nm);
+    Chang_car(&p->car);//Ä£Äâ³µÈë¿â
+    p->nxt = q->nxt;
+    q->nxt = p;
+    return 1;
+}
+
+void Car_Out(CHA* q, MESS* p)
+{
+    char ma[10], nm[10];
+    puts("ÄãÊÇ£º");
+    scanf("%s", nm);
+    puts("ÄãµÄÃÜÂëÊÇ£º");
+    scanf("%s", ma);
+    if(Fnd_di_chang_us_pnm(p, nm) == 0)
+    {
+        puts("ÄãÒª´´½¨ÕËºÅÂğ(´´½¨Îª0£¬·ñÔòÎª1)£º");
+        bool key = 0;
+        scanf("%d", &key);
+        if(key == 0)
+        {
+            Mak_Di_chang(p, nm);
+        }
+        else 
+        {
+            puts("Äã²»ÄÜ×ß£¬Òª¸¶Ç®\nÏà¸¶Ç®£¬±ØĞë´´½¨ÕËºÅ");
+            system("pause");
+            return ;
+        }
+    }
+    puts("³µÅÆºÅÊÇ£º");
+    CAR x;
+    scanf("%s", x.nm);
+    bool Del_Di_car(q);
+}
+
+bool Fnd_di_chang_us_pnm(MESS* q, char* nm)
+{
+    while(q->nxt != NULL && strcmp(q->nxt->p_n, nm)) 
+    {
+        q = q->nxt;// , puts(q->nxt->p_n);
+    }
+    if(q->nxt != NULL && !strcmp(q->nxt->p_n, nm)) 
+    {
+        return 1;
+    }
     return 0;
+}
+
+bool Del_Di_car(CHA* q, char* nm)
+{
+    if(q->nxt == NULL)
+    {
+        puts("Í£³µ³¡ÄÚÃ»ÓĞ³µ");
+    }
+    else 
+    {
+        while(q->nxt->nxt != NULL && strcmp(q->nxt->car.nm, nm))
+        {
+            q->nxt = q->nxt->nxt;
+        }
+        if(q->nxt->nxt != NULL && !strcmp(q->nxt->car.nm, nm))
+        {
+            ////////////??????????????????????????¼ÇËãÇ®
+            CHA* x = q->nxt;
+            q->nxt = q->nxt->nxt;
+            free(x);
+            puts("³µ³öÍ£³µ³¡ÁË£¡");
+            return 1;
+        }
+        else puts("Ã»³öÈ¥");
+        system("pause");
+    }
+    return 0;
+}
+
+bool Fnd_di_che_us_cnm(CHA* q, char* nm)
+{
+    while(q->nxt != NULL && strcmp(q->nxt->car.nm, nm)) 
+    {
+        q = q->nxt;
+    }
+    if(q->nxt != NULL && !strcmp(q->nxt->car.nm, nm)) 
+    {
+        printf("ÄãµÄ³µÔÚ%dÇøµÄ%dºÅÍ£³µÎ»ÉÏ\n", q->nxt->car.wer.x, q->nxt->car.wer.y);
+        return 1;
+    }
+    return 0;
+}
+
+void Car_Wer(CHA* q)
+{
+    char s[10];
+    puts("ÄãµÄ³µÅÆºÅÊÇ£º");
+    scanf("%s", s);
+    if( Fnd_di_che_us_cnm(q, s) == 0)
+    {
+        puts("ÄãµÄ³µ²»ÔÚ³µ¿â");
+    }
+    system("pause");
+}
+
+bool Mak_Di_chang(MESS* q, char * nm)
+{
+    MESS* p;
+    if((p = (MESS*)malloc(sizeof(MESS))) == NULL)
+    {
+        puts("Malloc over wen make LIST!!!");
+        return 0;
+    }
+    char s[100], c[100];
+    bool key = 0;
+    while(key == 0)
+    {
+        printf("ÇëÊäÈëÄãµÄÃÜÂë£º");
+        scanf("%s", s);
+        printf("È·ÈÏÄãµÄÃÜÂë£º");
+        scanf("%s", c);
+        if(strcmp(s, c) == 0) 
+        {
+            key = 1;
+            puts("ÃÜÂëĞŞ¸Ä³É¹¦");
+        }
+        else puts("Á½´ÎÃÜÂë²»Ò»Ñù£¨ÇëÖØĞÂÊäÈë£©");
+    }
+    strcpy(p->p_n,nm);
+    strcpy(p->mima, s);
+    p->V = 0;
+    p->vue = 0;
+    // if(strcmp(c, p->mima))puts("no OK");
+    p->nxt = q->nxt;
+    q->nxt = p;
+    return 1;
+}
+
+void look_list_mess(MESS* p)
+{
+    for(int i = 0; i < 3; i++)
+    // while(p->nxt != NULL)
+    {
+        printf("ÄãµÄÃû×ÖÊÇ%s \nÄãµÄÓà¶îÎª%llf\nÄãÒÑ¾­Ê¹ÓÃÊ±³¤Îª%d\n", p->nxt->p_n, p->nxt->vue, p->nxt->V);
+        p = p->nxt;
+    }
+}
+
+void look_list_cha(CHA* p)
+{
+    while(p != NULL)
+    {
+        printf("³µÅÆºÅÊÇ%s \n³µÊÇ%dÀ´µÄ\n³µÔÚ%dÇø%dºÅ", p->car.nm, p->car.now_t, p->car.wer.x, p->car.wer.y);
+        p = p->nxt;
+    }
 }
 
 int read_f_num(FILE* fp)
@@ -89,213 +526,31 @@ int read_f_num(FILE* fp)
     return num;
 }
 
-void init_sys(char** plc, MESS* peo)
+void Chang_car(CAR* p)
 {
-    FILE * sys = NULL;
-    // è¯»å–åŸºç¡€é…ç½®æ–‡ä»¶
-    // if((sys = fopen(".\\data\\system", "r")) == NULL)
-    // {
-    //     printf("Can not open data file system\n");
-    //     exit(0);
-    // }
-    // init_con = (int*)malloc(sizeof(int)*PZ_NUM);
-    // for(int i = 0; i < PZ_NUM; i++)
-    // {
-    //     init_con[i] = read_f_num(sys);
-    // }
-    // user_len = init_con[0];
-    // paswd_len = init_con[1];
-    // c_num = init_con[2];
-    // ten_mun = init_con[3];
-    // hfh_mun = init_con[4];
-    // hou_mun = init_con[5];
-    // // printf("%d\n",user_len);
-    // fclose(sys); // é…ç½®ä¿¡æ¯è¯»å®Œ
-
-    peo = (MESS*)malloc(sizeof(MESS) * p_num);
-    if((sys = fopen(".\\data\\usr_p", "r")) == NULL)
+    int x = Fnd_chang();
+    if(x != 0)
     {
-        printf("Can not open data file usr_p\n");
-        exit(0);
+        p->wer.x = x / 10;
+        p->wer.y = x % 10;
+        printf("ÄãµÄ³µÔÚ%dÇø%dºÅÍ£³µÎ»", p->wer.x, p->wer.y);
+        system("pause");
+        return ;
     }
-    int i = 0;
-    // while(fscanf(sys, "%s %s %d %d %llf %d %d", peo[i].peo, peo[i].car.nm, &peo[i].car.nx_t, &peo[i].car.now_t, &peo[i].V, &peo[i].vue, &peo[i].wer.x, &peo[i].wer.y) != EOF)
-    // {
-    //     i++;
-    // }
-    int len = i; i = 0;
-    for(i = 0; i < len; i++)
-    {
-        // printf("ç”¨æˆ·åï¼š%s è½¦åï¼š%s ä¸Šæ¬¡æ¥çš„æ—¶é—´ï¼š%d è¿™æ¬¡æ¥çš„æ—¶é—´ï¼ˆä¸åœ¨åœè½¦åœºæ—¶é—´ä¸º0ï¼‰ï¼š%d å·²åœæ—¶é•¿ï¼š%d  è´¦æˆ·ä½™é¢ï¼š%llf ä½ç½®xï¼š%d ä½ç½®yï¼š%d", peo[i].peo, peo[i].car.nm, peo[i].car.nx_t, peo[i].car.now_t, peo[i].V, peo[i].vue, peo[i].wer.x, peo[i].wer.y); //è¯»å– ç”¨æˆ·å è½¦å ä¸Šæ¬¡æ¥çš„æ—¶é—´ è¿™æ¬¡æ¥çš„æ—¶é—´ï¼ˆä¸åœ¨åœè½¦åœºæ—¶é—´ä¸º0ï¼‰ å·²åœæ—¶é•¿ è´¦æˆ·ä½™é¢ ä½ç½®x ä½ç½®y
-    }
+    else puts("ÄãµÄ³µÃ»Î»ÖÃÁË");
+    return;
 }
 
-void He_init()
+int Fnd_chang()
 {
-    int c;
-    if(NOW <= -3)
+    for(int i = 1; i <= 100; i++)
     {
-        system("cls");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        puts("çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸å¯†ç é”™è¯¯çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸çˆ†ç‚¸");
-        NOW = 100;
-        return;
-    }
-    else if(NOW ==0)
-    {
-        system("cls");
-        puts("***********************************");
-        puts("***********0.è¯·ç™»å½•****************");
-        puts("***********1.é€€å‡º******************");
-        puts("***********************************");
-        printf("è¯·é€‰æ‹©ç¨‹åºåŠŸèƒ½ï¼š");
-        scanf("%d",&c);
-        if(c==0)//ç™»å½•
+        if(chang[i] == 0)
         {
-            if(IsRight() != 1)
-            {
-                puts("å¯†ç é”™è¯¯");
-                system("pause");
-                //system("pause");
-            }
-            else
-            {
-                puts("æ¬¢è¿ç®¡ç†å‘˜");
-                system("pause");
-            }
-        }
-        else if(c==1)
-        {
-            NOW=100;
-        }
-        else
-        {
-            puts("è¾“å…¥æ ¼å¼æœ‰é—®é¢˜");
-            system("pause");
+            chang[i] = 1; 
+            return i;
         }
     }
-    else if(NOW<0)
-    {
-        system("cls");
-        puts("*******å¯†ç é”™è¯¯ä¸‰æ¬¡å°†çˆ†ç‚¸***********");
-        puts("***********0.è¯·ç™»å½•****************");
-        puts("***********0.è¯·ç™»å½•****************");
-        puts("***********å¯†ç é”™è¯¯****************");
-        printf("***********å·²é”™è¯¯%dæ¬¡***************\n",-NOW);
-        printf("è¯·é€‰æ‹©ç¨‹åºåŠŸèƒ½ï¼š");
-        scanf("%d",&c);
-        if(c==0)//ç™»å½•
-        {
-            if(IsRight()==0)
-            {
-                puts("å¯†ç é”™è¯¯");
-                system("pause");
-            }
-            else
-            {
-                puts("æ¬¢è¿ç®¡ç†å‘˜");
-                system("pause");
-            }
-        }
-        else
-        {
-            puts("è¾“å…¥æœ‰é—®é¢˜");
-            system("pause");
-        }
-    }
-    else
-    {
-        system("cls");
-        puts("**********************************");
-        puts("*************0.å¡å†…å……å€¼***********");
-        puts("*************1.åœè½¦***************");
-        puts("*************2.å–è½¦***************");
-        puts("*************3.æŸ¥è½¦åœ¨å“ª***********");
-        puts("*************4.é€€å‡º***************");
-        puts("*************5.é€€å‡ºç¨‹åº***********");
-        puts("*************6.é…ç½®ç³»ç»Ÿ***********");
-        puts("**********************************");
-        printf("è¯·é€‰æ‹©ç¨‹åºåŠŸèƒ½ï¼š");
-        scanf("%d",&c);
-        if(c == 0)//ç»“è´¦
-        {}
-        else if(c == 1)//è½¦æ¥
-        {
-            Car_Com();
-        }
-        else if(c == 2)//è½¦èµ°
-        {
-            Car_Out();
-        }
-        else if(c == 3)//è½¦åœ¨å“ª
-        {
-            Car_Wer();
-        }
-        else if(c == 4)//é€€å‡ºç™»å½•
-        {
-            NOW=0;
-        }
-        else if(c == 5)//é€€å‡ºç¨‹åº
-        {
-            NOW=100;
-        }
-        else if(c == 6)
-        {
-            Set_sys();
-        }
-        else
-        {
-            puts("è¾“å…¥æœ‰é—®é¢˜");
-            system("pause");
-        }
-    } 
+    return 0;
 }
 
-bool IsRight()
-{
-    bool key = 0;
-    FILE* fp;
-    char* user_name,* user_paswd;
-    user_name = (char*)malloc(user_len*sizeof(char));
-    user_paswd = (char*)malloc(paswd_len*sizeof(char));
-    if((fp = fopen(".\\data\\user_file","r")) == NULL)
-    {
-        printf("Cap_numotopenwritefile\n");
-        exit(0);
-    }
-    char* name,* paswd;
-    name = (char*)malloc(100*sizeof(char));
-    paswd = (char*)malloc(100*sizeof(char));
-    puts("è¯·è¾“å…¥ç”¨æˆ·åï¼š");
-    scanf("%s", name);
-    puts("è¯·è¾“å…¥å¯†ç ï¼š");
-    scanf("%s", paswd);
-    fgets(user_name, user_len, fp);
-    fgets(user_paswd, paswd_len, fp);
-
-    //puts(name);
-    //puts(user_name);
-    //puts(paswd);
-    //puts(user_paswd);
-
-    //puts(strcmp(name,user_name)==0?"1":"0");
-    //puts(strcmp(paswd,user_paswd)==0?"1":"0");
-    if(strcmp(paswd, user_paswd)==0&&strcmp(name, user_name)==0)key=1;
-    else key=0;
-    free(name);
-    free(user_name);
-    free(paswd);
-    free(user_paswd);
-    fclose(fp);
-    key==0?(NOW--):(NOW=1);
-    //printf("%d", NOW);//è¾“å‡ºé”™è¯¯æ¬¡æ•°
-    return key;
-}
