@@ -56,27 +56,41 @@
 
 //     printf("Current time: %s\n", buffer); //打印格式化的日期和时间字符串
 //     printf("Time since epoch: %d seconds\n", seconds); // 以秒为单位打印now和epoch之间的差值
-
+//     printf("%lld", rawtime);
 //     return 0;
 // }
 
 
 
-#include<stdio.h>
+// #include<stdio.h>
 
+// int main()
+// {
+//     FILE *fp = fopen("data.txt", "r");
+//     if (fp == NULL) {
+//         printf("Failed to open file\n");
+//         return 1;
+//     }
+
+//     double x, y, z;
+//     while (fscanf(fp, "%lf %lf %lf", &x, &y, &z) == 3) {
+//         printf("x=%f y=%f z=%f\n", x, y, z);
+//     }
+
+//     fclose(fp);
+
+// }
+
+
+#include<stdio.h>
 int main()
 {
-    FILE *fp = fopen("data.txt", "r");
-    if (fp == NULL) {
-        printf("Failed to open file\n");
-        return 1;
+    FILE* sys = NULL;
+    if((sys = fopen(".\\data\\usr_ch", "r")) == NULL)
+    {
+        printf("Can not open data file usr_ch\n");
+        // system("pause");
+        sys = fopen(".\\data\\usr_ch", "w");
     }
-
-    double x, y, z;
-    while (fscanf(fp, "%lf %lf %lf", &x, &y, &z) == 3) {
-        printf("x=%f y=%f z=%f\n", x, y, z);
-    }
-
-    fclose(fp);
-
+    return 0;
 }

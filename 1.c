@@ -23,7 +23,7 @@ bool chang[101] = {1};
 
 typedef struct CAR{
     char nm[10];
-    time_t nx_t, now_t; //上次走的时间，这次来的时间
+    time_t nx_t, now_t; //来的时间
     struct {
         int x, y;
     }wer; //车辆位置
@@ -70,6 +70,10 @@ void Car_Wer(CHA*); //车在哪
 void Chang_car(CAR*);//为新来的车分配车位
 int Fnd_chang();//找到空车位，返回车位的抽象空间
 
+time_t Read_C_Timt(time_t*);//读取时间，输出时间，返回与当前时间的差值
+void Count_Money();//计算停车场盈利
+double Tran_Mony(time_t*);//出停车场结账
+
 
 int main()
 {
@@ -77,11 +81,21 @@ int main()
     p.nxt = NULL;
     q.nxt = NULL;
     init_sys(&p, &q);
+    puts("是否查看系统自检数据");
+    int a;
+    scanf("%d", &a);
+    if(a) 
+    {
+        puts("用户账号有如下");
+        look_list_mess(&p);
+        puts("停车场现有车信息如下");
+        puts("停车场总收益如下");
+    }
     // while(NOW != 100)
     // {
     //     He_init();
     // }
-    // return 0;
+    return 0;
 }
 
 void init_sys(MESS* peo, CHA* cha)
@@ -135,10 +149,14 @@ void init_sys(MESS* peo, CHA* cha)
     peo->nxt = NULL;
     Init_Di_chang(sys, peo);
     // look_list_mess(peo);
-    for(i = 0; i < len; i++)
+    fclose(sys);
+    if((sys = fopen(".\\data\\usr_ch", "r")) == NULL)
     {
-        // printf("用户名：%s 车名：%s 上次来的时间：%d 这次来的时间（不在停车场时间为0）：%d 已停时长：%d  账户余额：%llf 位置x：%d 位置y：%d", peo[i].peo, peo[i].car.nm, peo[i].car.nx_t, peo[i].car.now_t, peo[i].V, peo[i].vue, peo[i].wer.x, peo[i].wer.y); //读取 用户名 车名 上次来的时间 这次来的时间（不在停车场时间为0） 已停时长 账户余额 位置x 位置y
+        printf("Can not open data file usr_ch\n");
+        system("pause");
+        return;
     }
+    
 }
 
 bool Init_Di_chang(FILE* fp, MESS* q)
@@ -159,11 +177,35 @@ bool Init_Di_chang(FILE* fp, MESS* q)
         q->nxt = (MESS*)malloc(sizeof(MESS));
         q = q->nxt;
         q->nxt = NULL;
-        system("pause");
+        // system("pause");
     }
     return 1;
 }
 
+time_t Read_C_Timt(time_t* T)
+{
+    time_t x = time(NULL);
+    struct tm * timeinfo;
+    timeinfo = localtime (T);
+    char buffer[26];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
+    printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
+    return x - *T;
+}
+
+void Count_Money();
+double Tran_Mony(time_t* T)
+{
+    int h, fh, m;
+    h = *T / (60 * 60);
+    fh = *T / 60 - h * 60;
+    m = fh - 30;
+    fh /= 30;
+    if(m < 0) m = 0;
+    else if(m > 10) fh++;
+
+    return h * hou_mun + fh * hfh_mun + m * ten_mun;
+}
 void He_init()
 {
     int c;
@@ -409,7 +451,8 @@ bool Del_Di_car(CHA* q, char* nm)
         }
         if(q->nxt->nxt != NULL && !strcmp(q->nxt->car.nm, nm))
         {
-            ////////////??????????????????????????记算钱
+            int vue = Read_C_Timt(&q->car.now_t);
+            vue = Tran_Mony((time_t*)&vue);
             CHA* x = q->nxt;
             q->nxt = q->nxt->nxt;
             free(x);
@@ -483,8 +526,8 @@ bool Mak_Di_chang(MESS* q, char * nm)
 
 void look_list_mess(MESS* p)
 {
-    for(int i = 0; i < 3; i++)
-    // while(p->nxt != NULL)
+    // for(int i = 0; i < 3; i++)
+    while(p->nxt != NULL)
     {
         printf("你的名字是%s \n你的余额为%llf\n你已经使用时长为%d\n", p->nxt->p_n, p->nxt->vue, p->nxt->V);
         p = p->nxt;
@@ -534,6 +577,8 @@ void Chang_car(CAR* p)
         p->wer.x = x / 10;
         p->wer.y = x % 10;
         printf("你的车在%d区%d号停车位", p->wer.x, p->wer.y);
+        time(&p->now_t);
+        Read_C_Timt(&p->now_t);
         system("pause");
         return ;
     }
