@@ -5,6 +5,7 @@
 #include<time.h>
 
 #define PZ_NUM 7      //配置文件条目数量
+#define CHAR_LONG 20
 
 //DATA
 
@@ -42,40 +43,43 @@ typedef struct CHA{
     struct CHA* nxt;
 }CHA; //停车场
 
-// CHA cha;
-// MESS peo;
 
 
 // DODODO
+int read_int(char*);
+double read_double(char*);
+long long read_longlong(char*);
+void int_to_str(int, char*);
+void double_to_str(double, char*);
+void longlong_to_str(long long, char*);
 
 void init_sys(MESS*, CHA*, bool*); //初始化系统
 void Set_sys(); //设置系统
 
-bool Init_Di_mess(FILE*, MESS*);//初始化用户
-bool Mak_Di_chang(MESS*, char*);//新建用户
+void Init_Di_mess(FILE*, MESS*);//初始化用户
+bool CreateUser(MESS*, char*);//新建用户
 // MESS* Del_Di_chang(MESS*);//删除用户
-void look_list_mess(MESS*);//遍历用户链表
+void Print_User_List(MESS*, bool);//遍历用户链表
 bool Fnd_di_chang_us_pnm(MESS*, char*);//使用用户名寻找用户
 
-bool Init_Di_car(FILE*, CHA*, bool*);//初始化停车场
+void Init_Di_car(FILE*, CHA*, bool*);//初始化停车场
 bool Mak_Di_car(CHA*, bool*);//模拟车来停车场
-bool Del_Di_car(CHA*, char*);//模拟车出停车场
-void look_list_car(CHA*);//遍历停车场车信息
+bool Del_Di_car(CHA*, char*);//模拟车出停车场、、、、、、、、、、、、、、、、、、、、、
+void Print_Car_List(CHA*, bool);//遍历停车场车信息
 bool Fnd_di_che_us_cnm(CHA* , char*);
 void Chang_car(CAR*, bool*);//为新来的车分配车位
 int Fnd_chang(bool* P);//找到空车位，返回车位的抽象空间
-int look_list_chang(bool*);//遍历停车场场地信息
+int Print_List_Chang(bool*);//遍历停车场场地信息
 
-bool IsRight(); //密码判断，返回0或1；
-int read_f_num(FILE*); //读取配置文件中的数字，
+bool Check_Login(); //密码判断，返回0或1；
 void He_init(MESS*, CHA*, bool*); //hello界面
 
 void Car_Com(CHA*, bool*); //车来了，需要车牌号，会为车牌号分配对应的停车位
 void Car_Out(CHA*, MESS*); //车走了
 void Car_Wer(CHA*); //车在哪
 
-time_t Read_C_Timt(time_t*);//读取时间，输出时间，返回与当前时间的差值
-void Count_Money();//计算停车场盈利
+int Read_Timt(time_t*);//读取时间，输出时间，返回与当前时间的差值
+// void Count_Money();//计算停车场盈利
 double Tran_Mony(time_t*);//出停车场结账
 
 
@@ -88,16 +92,17 @@ int main()
     mess_hand.nxt = NULL;
     cha_hand.nxt = NULL;
     init_sys(&mess_hand, &cha_hand, chang);//全部初始化
-    puts("是否查看系统自检数据");
-    int a;
-    scanf("%d", &a);
+    puts("是否查看系统自检数据(0为否)");
+    char s[20];
+    scanf("%s", &s);
+    int a = read_int(s);
     if(a) 
     {
         puts("用户账号有如下");
-        look_list_mess(&mess_hand);
+        Print_User_List(&mess_hand, 0);
         puts("停车场现有车信息如下：");
-        look_list_car(cha_hand.nxt);
-        look_list_chang(chang);
+        Print_Car_List(cha_hand.nxt, 0);
+        Print_List_Chang(chang);
         puts("停车场总收益3如下");
         system("pause");
     }
@@ -108,6 +113,68 @@ int main()
     return 0;
 }
 
+/// @brief 用于将一个int类型的值转换为一个字符串，并存储在传入的char*指针所指向的数组中
+/// @param i 整数
+/// @param s 保存字符串
+void int_to_str(int i, char* s)
+{
+    sprintf(s, "%d", i); // 调用sprintf函数，将int类型的值按照%d的格式写入到s所指向的数组中
+}
+
+/// @brief 用于将一个double类型的值转换为一个字符串，并存储在传入的char*指针所指向的数组中
+/// @param d double
+/// @param s 保存字符串
+void double_to_str(double d, char* s)
+{
+    sprintf(s, "%.02lf", d); // 调用sprintf函数，将double类型的值按照%lf的格式写入到s所指向的数组中
+}
+
+/// @brief 用于将一个long long类型的值转换为一个字符串，并存储在传入的char*指针所指向的数组中
+/// @param ll 
+/// @param s 
+void longlong_to_str(long long ll, char* s)
+{
+    sprintf(s, "%lld", ll); // 调用sprintf函数，将long long类型的值按照%lld的格式写入到s所指向的数组中
+}
+
+
+/// @brief 从键盘读取一个字符串，并转换为一个int类型的值
+/// @return int
+int read_int(char* s)
+{
+    // char s[20]; // 定义一个字符串数组，用于存储输入的字符串
+    int i; // 定义一个int类型的变量，用于存储转换后的值
+    // printf("请输入一个整数：\n"); // 打印提示信息
+    // scanf("%s", s); // 调用scanf函数，从键盘读取一个字符串，并存储在s中
+    i = atoi(s); // 调用atoi函数，将字符串转换为int类型，并赋值给i
+    return i; 
+}
+/// @brief  从键盘读取一个字符串，并转换为一个double类型的值
+/// @return double
+double read_double(char* s)
+{
+    // char s[20]; // 定义一个字符串数组，用于存储输入的字符串
+    double d; // 定义一个double类型的变量，用于存储转换后的值
+    // printf("请输入一个小数：\n"); // 打印提示信息
+    // scanf("%s", s); // 调用scanf函数，从键盘读取一个字符串，并存储在s中
+    d = atof(s); // 调用atof函数，将字符串转换为double类型，并赋值给d
+    return d; // 返回d的值
+}
+
+/// @brief 用于将一个字符串转换为一个long long类型的值，并返回该值
+/// @param s 存储位置
+/// @return long long
+long long read_longlong(char* s)
+{
+    long long ll; // 定义一个long long类型的变量，用于存储转换后的值
+    ll = atoll(s); // 调用atoll函数，将字符串转换为long long类型，并赋值给ll
+    return ll; // 返回ll的值
+}
+
+/// @brief 初始化系统
+/// @param peo 用户链表
+/// @param cha 停车场的车的列表
+/// @param chang 一维数组模拟的停车场
 void init_sys(MESS* peo, CHA* cha, bool* chang)
 {
     FILE * sys = NULL;
@@ -124,7 +191,9 @@ void init_sys(MESS* peo, CHA* cha, bool* chang)
         char c[100];
         for(int i = 0; i < PZ_NUM; i++)
         {
-            fscanf(sys, "%s %d", c,&init_con[i]);
+            char s[20];
+            fscanf(sys, "%s %s", c, s);
+            init_con[i] = read_int(s);
         }
         user_len = init_con[0];
         paswd_len = init_con[1];
@@ -170,7 +239,7 @@ void init_sys(MESS* peo, CHA* cha, bool* chang)
     int len = 0, i = 0;
     peo->nxt = NULL;
     Init_Di_mess(sys, peo);
-    // look_list_mess(peo);
+    // Print_User_List(peo);
     fclose(sys);
     //开始初始化停车场
     puts("开始初始化停车场");
@@ -182,9 +251,8 @@ void init_sys(MESS* peo, CHA* cha, bool* chang)
         return;
     }
     Init_Di_car(sys, cha, chang);
-    // puts("OVER!");
 }
-
+/// @brief 设置系统
 void Set_sys()
 {
     FILE* fp = NULL;
@@ -198,8 +266,10 @@ void Set_sys()
     int num[PZ_NUM + 1], i = 0;
     for(int i = 1; i < PZ_NUM + 1; i++)
     {
-        fscanf(fp, "%s %d", a[i], &num[i]);
-        printf("%s%d\n", a[i], num[i]);
+        char s[CHAR_LONG];
+        fscanf(fp, "%s %s", a[i], s);
+        num[i] = read_int(s);
+        printf("%s %d\n", a[i], num[i]);
     }
     fclose(fp);
     if((fp = fopen(".\\data\\system", "w")) == NULL)
@@ -220,50 +290,63 @@ void Set_sys()
         if(k == "Y")
         {
             printf("需要改为：");
-            scanf("%d", &num[i]);
+            char s[CHAR_LONG];
+            scanf("%s", s);
+            num[i] = read_int(s);
             k[0] = 'O';
         }
+        // int_to_str(num[i], s);
+        // fprintf(fp, "%s  %s \n",a[i], s );
         fprintf(fp, "%s  %d \n",a[i], num[i] );
     }
     fclose(fp);
 }
-
-bool Init_Di_mess(FILE* fp, MESS* q)
+/// @brief 初始化用户
+/// @param fp 用户配置文件
+/// @param q 用户链表
+/// @return 
+void Init_Di_mess(FILE* fp, MESS* q)
 {
-    // q->nxt = (MESS*)malloc(sizeof(MESS));
-    // q = q->nxt;
-    MESS* X = (MESS*)malloc(sizeof(MESS));
-    X->nxt = NULL;
-    char s1[10], s2[10];
-    double a; int b;
-    while(fscanf(fp, "%s %s %lf %d", s1, s2, &a, &b) != EOF)// q->p_n, q->mima, q->vue, q->V) != EOF)
+    char s1[10], s2[10], s3[20], s4[20];
+    while(fscanf(fp, "%s %s %s %s", s1, s2, s3, s4) != EOF)// q->p_n, q->mima, q->vue, q->V) != EOF)
     {
-        // printf("你的名字是%s \n你的密码是%s \n你的余额为%lf\n你已经使用时长为%d\n", s1, s2, a, b);
-        strcpy(X->p_n, s1);
-        strcpy(X->mima, s2);
-        X->vue = a;
-        X->V = b;
-        // printf("你的名字是%s \n你的密码是%s \n你的余额为%lf\n你已经使用时长为%d\n",q->p_n, q->mima, q->vue, q->V);
-        X->nxt = q->nxt;
-        q->nxt = X;
-        X = (MESS*)malloc(sizeof(MESS));
-        // system("pause");
+        // a /= 100;
+        // printf("你的名字是%s \n你的密码是%s \n你的余额为%s\n你已经使用时长为%s\n", s1, s2, s3, s4);
+        q->nxt = (MESS*)malloc(sizeof(MESS));
+        if (q->nxt == NULL) {
+            printf("Memory allocation failed.\n");
+            break;
+        }
+        strcpy(q->nxt->p_n, s1);
+        strcpy(q->nxt->mima, s2);
+        q->nxt->vue = read_double(s3);
+        q->nxt->V = read_int(s4);
+        q->nxt->nxt = NULL;
+        // 移动到下一个节点
+        q = q->nxt;
     }
-    return 1;
+    return ;
 }
-
-time_t Read_C_Timt(time_t* T)
+/// @brief 读取时间
+/// @param T 需要翻译的time_t
+/// @return 需要翻译的时间与当前的时间差秒数，如果T为空指针，则返回-1
+int Read_Timt(time_t* T)
 {
-    time_t x = time(NULL);
+    if(T == NULL) // 检查T是否为空指针
+    {
+        printf("无效的time_t指针\n");
+        return -1; // 返回一个错误标志
+    }
     struct tm * timeinfo;
     timeinfo = localtime (T);
     char buffer[26];
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
     printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
-    return x - *T;
+    time_t now = time(NULL); // 获取当前时间
+    return difftime(now, *T); // 返回与当前时间的差值，单位是秒
 }
 
-void Count_Money();
+// void Count_Money();
 double Tran_Mony(time_t* T)
 {
     int h, fh, m;
@@ -278,7 +361,7 @@ double Tran_Mony(time_t* T)
 }
 void He_init(MESS* peo, CHA* cha, bool* P)
 {
-    int c;
+    char c[10];
     if(NOW <= -3)
     {
         system("cls");
@@ -303,10 +386,10 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         puts("***********1.退出******************");
         puts("***********************************");
         printf("请选择程序功能：");
-        scanf("%d",&c);
-        if(c==0)//登录
+        scanf("%s",c);
+        if(strcmp(c, "0") == 0)//登录
         {
-            if(IsRight() != 1)
+            if(Check_Login() != 1)
             {
                 puts("密码错误");
                 system("pause");
@@ -318,7 +401,7 @@ void He_init(MESS* peo, CHA* cha, bool* P)
                 system("pause");
             }
         }
-        else if(c==1)
+        else if(strcmp(c, "1") == 0)
         {
             NOW=100;
         }
@@ -337,10 +420,10 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         puts("***********密码错误****************");
         printf("***********已错误%d次***************\n",-NOW);
         printf("请选择程序功能：");
-        scanf("%d",&c);
+        scanf("%s",c);
         if(c==0)//登录
         {
-            if(IsRight()==0)
+            if(Check_Login()==0)
             {
                 puts("密码错误");
                 system("pause");
@@ -361,7 +444,7 @@ void He_init(MESS* peo, CHA* cha, bool* P)
     {
         system("cls");
         puts("**********************************");
-        puts("*************0.卡内充值***********");
+        puts("*************0.个人业务***********");
         puts("*************1.停车***************");
         puts("*************2.取车***************");
         puts("*************3.查车在哪***********");
@@ -373,41 +456,41 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         puts("************10.配置系统***********");
         puts("**********************************");
         printf("请选择程序功能：");
-        scanf("%d",&c);
-        if(c == 0)//结账
+        scanf("%s",c);
+        if(strcmp(c, "0") == 0)//结账
         {}
-        else if(c == 1)//车来
+        else if(strcmp(c, "1") == 0)//车来
         {
             Car_Com(cha, P);
         }
-        else if(c == 2)//车走
+        else if(strcmp(c, "2") == 0)//车走
         {
             Car_Out(cha, peo);
             system("pause");
         }
-        else if(c == 3)//车在哪
+        else if(strcmp(c, "3") == 0)//车在哪
         {
             Car_Wer(cha);
         }
-        else if(c == 4)//退出登录
+        else if(strcmp(c, "4") == 0)//退出登录
         {
             NOW = 0;
         }
-        else if(c == 5)//退出程序
+        else if(strcmp(c, "5") == 0)//退出程序
         {
             NOW = 100;
         }
-        else if(c == 6)
+        else if(strcmp(c, "6") == 0)
         {
-            look_list_mess(peo);
+            Print_User_List(peo, 0);
             system("pause");
         }
-        else if(c == 7)
+        else if(strcmp(c, "7") == 0)
         {
-            look_list_car(cha);
+            Print_Car_List(cha, 0);
             system("pause");
         }
-        else if(c == 10)
+        else if(strcmp(c, "10") == 0)
         {
             Set_sys();
         }
@@ -418,57 +501,76 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         }
     } 
 }
-
-bool IsRight()
+/// @brief  该函数用于检查用户输入的用户名和密码
+/// @return  是否正确
+bool Check_Login()
 {
-    bool key = 0;
-    FILE* fp;
-    char* user_name,* user_paswd;
-    user_name = (char*)malloc(user_len*sizeof(char));
-    user_paswd = (char*)malloc(paswd_len*sizeof(char));
-    if((fp = fopen(".\\data\\user_file","r")) == NULL)
+    // 打开文件
+    FILE* file = fopen(".\\data\\user_file","r");
+    if(file == NULL) // 检查文件是否打开成功
     {
-        printf("Cap_numotopenwritefile\n");
+        printf("Can not open write file\n");
         exit(0);
     }
-    char* name,* paswd;
-    name = (char*)malloc(100*sizeof(char));
-    paswd = (char*)malloc(100*sizeof(char));
+    
+    // 读取文件中存储的用户名和密码
+    char* username, * password;
+    username = (char*)malloc(sizeof(char) * user_len);
+    password = (char*)malloc(sizeof(char) * paswd_len);
+    fgets(username, user_len, file);
+    fgets(password, paswd_len, file);
+    
+    // 关闭文件
+    fclose(file);
+    
+    // 获取用户输入的用户名和密码
+    char name[100], paswd[100];
     puts("请输入用户名：");
     scanf("%s", name);
     puts("请输入密码：");
     scanf("%s", paswd);
-    fgets(user_name, user_len, fp);
-    fgets(user_paswd, paswd_len, fp);
-
-    if(strcmp(paswd, user_paswd)==0&&strcmp(name, user_name)==0)key=1;
-    else key=0;
-
-    free(name);
-    free(user_name);
-    free(paswd);
-    free(user_paswd);
-    fclose(fp);
-    key==0?(NOW--):(NOW=1);
-
-    return key;
+    
+    // 比较用户名和密码是否匹配
+    if(strcmp(paswd, password)==0 && strcmp(name, username)==0)
+    {
+        // 匹配成功，返回true，并将NOW设为1
+        NOW = 1;
+        return true;
+    }
+    else 
+    {
+        // 匹配失败，返回false，并将NOW减1
+        NOW--;
+        return false;
+    }
 }
 
+/// @brief 车来停车场
+/// @param q 停车场车辆链表
+/// @param P 一维数组模拟的停车场
 void Car_Com(CHA* q, bool* P)
 {
     if(Mak_Di_car(q, P) == 1)
     {
-        puts("你的车以入库！");
+        puts("你的车入库了！");
     }
     else puts("有问题");
 }
-bool Init_Di_car(FILE* fp, CHA* cha, bool* P)
+/// @brief 初始化停车场
+/// @param fp 停车场车辆信息文件
+/// @param cha 车辆链表
+/// @param P 一维数组模拟的停车场
+void Init_Di_car(FILE* fp, CHA* cha, bool* P)
 {
     CHA* x;
+    // puts("Init_Di_car ing.....");
     x = (CHA*)malloc(sizeof(CHA));
     int i = 0;
-    while(fscanf(fp, "%s %lld %d %d", x->car.nm, &x->car.now_t, &x->car.wer.x, &x->car.wer.y) != EOF)
+    char s1[CHAR_LONG], s2[CHAR_LONG], s3[CHAR_LONG];
+    while(fscanf(fp, "%s %s %s %s", x->car.nm, s1, s2, s3) != EOF)
     {
+        x->car.now_t = read_longlong(s1);
+        x->car.wer.x = read_int(s2), x->car.wer.y = read_int(s3);
         // printf("车牌号是%s \n车是%d来的\n车在%d区%d号\n",x->car.nm, x->car.now_t, x->car.wer.x, x->car.wer.y);
         x->nxt = cha->nxt;
         cha->nxt = x;
@@ -477,8 +579,13 @@ bool Init_Di_car(FILE* fp, CHA* cha, bool* P)
         x = (CHA*)malloc(sizeof(CHA));
     }
     // puts("Init_Di_car ok");
-    return i;
+
+    return ;
 }
+/// @brief 模拟车来停车场
+/// @param q 停车场车辆链表
+/// @param P 一维数组模拟的停车场
+/// @return 停车是否成功
 bool Mak_Di_car(CHA* q, bool* P)
 {
     CHA* p;
@@ -509,7 +616,7 @@ void Car_Out(CHA* q, MESS* p)
         scanf("%d", &key);
         if(key == 0)
         {
-            Mak_Di_chang(p, nm);
+            CreateUser(p, nm);
         }
         else 
         {
@@ -521,9 +628,12 @@ void Car_Out(CHA* q, MESS* p)
     puts("车牌号是：");
     CAR x;
     scanf("%s", x.nm);
-    bool Del_Di_car(q);
+    Del_Di_car(q, x.nm);
 }
-
+/// @brief 使用用户名寻找用户
+/// @param q 用户链表
+/// @param nm 用户名
+/// @return 是否找到
 bool Fnd_di_chang_us_pnm(MESS* q, char* nm)
 {
     while(q->nxt != NULL && strcmp(q->nxt->p_n, nm)) 
@@ -537,32 +647,53 @@ bool Fnd_di_chang_us_pnm(MESS* q, char* nm)
     return 0;
 }
 
-bool Del_Di_car(CHA* q, char* nm)
+/// @brief 模拟车出停车场
+/// @param q 停车场现在停着的车
+/// @param nm 要出停车场的车
+/// @return 出停车场是否成功
+bool Del_Di_car(CHA* k, char* nm)
 {
-    if(q->nxt == NULL)
+    if(k == NULL) // 没有停车
     {
         puts("停车场内没有车");
+        return 0;
     }
-    else 
+    
+    CHA* p = k; // 用一个临时变量来遍历链表
+    while(p->nxt != NULL && strcmp(p->nxt->car.nm, nm)) // 找到要出库的车辆或者到达链表尾部
     {
-        while(q->nxt->nxt != NULL && strcmp(q->nxt->car.nm, nm))
-        {
-            q->nxt = q->nxt->nxt;
-        }
-        if(q->nxt->nxt != NULL && !strcmp(q->nxt->car.nm, nm))
-        {
-            int vue = Read_C_Timt(&q->car.now_t);
-            vue = Tran_Mony((time_t*)&vue);
-            CHA* x = q->nxt;
-            q->nxt = q->nxt->nxt;
-            free(x);
-            puts("车出停车场了！");
-            return 1;
-        }
-        else puts("没出去");
-        system("pause");
+        p = p->nxt;
     }
-    return 0;
+    
+    if(p->nxt != NULL && !strcmp(p->nxt->car.nm, nm)) // 找到了要出库的车辆
+    {
+        double vue;
+        Read_Timt(&p->nxt->car.now_t); // 计算停车时间
+        struct tm * timeinfo;
+        timeinfo = localtime (&p->nxt->car.now_t);
+        char buffer[26];
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
+        printf("TIME_T的数据为%lld\n", p->nxt->car.now_t);
+        // printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
+        time_t now = time(NULL); // 获取当前时间
+        timeinfo = localtime (&now);
+
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
+        printf("车辆出库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
+
+        vue = Tran_Mony(&p->nxt->car.now_t); // 计算停车费用
+        printf("总金额为：%.02lf", vue);
+        CHA* car = p->nxt;
+        p->nxt = car->nxt; // 从链表中删除出库的车辆
+        free(car); // 释放内存
+        puts("车出停车场了！");
+        return 1;
+    }
+    else // 没有找到要出库的车辆
+    {
+        puts("没出去");
+        return 0;
+    }
 }
 
 bool Fnd_di_che_us_cnm(CHA* q, char* nm)
@@ -599,62 +730,135 @@ void Car_Wer(CHA* q)
     system("pause");
 }
 
-bool Mak_Di_chang(MESS* q, char * nm)
+/// @brief 新建用户
+/// @param head 用户链表
+/// @param name 用户名
+/// @return 新建成功
+bool CreateUser(MESS* head, char * name)
 {
-    MESS* p;
-    if((p = (MESS*)malloc(sizeof(MESS))) == NULL)
+    MESS* node;
+    // 分配内存空间
+    if((node = (MESS*)malloc(sizeof(MESS))) == NULL)
     {
         puts("Malloc over wen make LIST!!!");
         return 0;
     }
-    char s[100], c[100];
-    bool key = 0;
-    while(key == 0)
+    char password[100], confirm[100];
+    bool match = 0;
+    while(match == 0)
     {
         printf("请输入你的密码：");
-        scanf("%s", s);
+        scanf("%s", password);
         printf("确认你的密码：");
-        scanf("%s", c);
-        if(strcmp(s, c) == 0) 
+        scanf("%s", confirm);
+        if(strcmp(password, confirm) == 0) 
         {
-            key = 1;
+            match = 1;
             puts("密码修改成功");
         }
-        else puts("两次密码不一样（请重新输入）");
+        else 
+        {
+            puts("两次密码不一样（请重新输入）");
+        }
     }
-    strcpy(p->p_n,nm);
-    strcpy(p->mima, s);
-    p->V = 0;
-    p->vue = 0;
-    // if(strcmp(c, p->mima))puts("no OK");
-    p->nxt = q->nxt;
-    q->nxt = p;
+    // 复制用户名和密码
+    strcpy(node->p_n,name);
+    strcpy(node->mima, password);
+    node->V = 0;
+    node->vue = 0;
+
+    printf("你想充值多少：");
+    scanf("%llf", &node->vue);
+    printf("你的密码是%s，账户金额为%.2lf", node->mima, node->vue);
+    // 打开文件
+    FILE* p_mess;
+    if((p_mess = fopen(".\\data\\usr_p", "a")) == NULL)
+    {
+        printf("Can not open data file usr_p\n");
+        exit(0);
+    }
+
+    // 将用户信息写入文件
+    char s1[CHAR_LONG], s2[CHAR_LONG];
+    double_to_str(node->vue, s1);
+    int_to_str(node->V, s2);
+    fprintf(p_mess, "%s %s %s %s", node->p_n, node->mima, s1, s2);
+
+    // 关闭文件
+    fclose(p_mess);
+
+    // 将用户节点插入链表
+    node->nxt = head->nxt;
+    head->nxt = node;
+    
     return 1;
 }
 
-void look_list_mess(MESS* p)
+/// @brief 遍历用户信息
+/// @param head 停车场现有的用户信息
+/// @param BOL 判断是否打印到命令行
+void Print_User_List(MESS* head, bool BOL)
 {
-    // for(int i = 0; i < 3; i++)
-    while(p->nxt != NULL)
+    FILE* fp;
+    if((fp = fopen(".\\data\\usr_p", "w")) == NULL)
     {
-        printf("你的名字是%s \n你的余额为%llf\n你已经使用时长为%d\n", p->nxt->p_n, p->nxt->vue, p->nxt->V);
-        p = p->nxt;
+        printf("Can not open data file usr_p\n");
+        exit(0);
     }
-}
-
-void look_list_car(CHA* p)
-{
-    while(p != NULL)
+    // 遍历用户链表
+    while(head->nxt != NULL)
     {
+        // 打印用户信息
+        char s1[CHAR_LONG], s2[CHAR_LONG];
+        double_to_str(head->nxt->vue, s1);
+        int_to_str(head->nxt->V, s2);
+        fprintf(fp, "%s %s %s %s\n", head->nxt->p_n, head->nxt->mima, s1, s2);
+        if(!BOL)
+        printf("你的名字是%s \n你的余额为%.02llf\n你已经使用时长为%d\n", head->nxt->p_n, head->nxt->vue, head->nxt->V);
+        // 移动到下一个节点
+        head = head->nxt;
+    }
+    fclose(fp);
+}
+/// @brief 遍历停车场车信息
+/// @param head 停车场现有的车辆信息
+/// @param BOL 判断是否打印到命令行
+void Print_Car_List(CHA* head, bool BOL)
+{
+    FILE* fp;
+    if((fp = fopen(".\\data\\usr_ch", "w")) == NULL)
+    {
+        printf("Can not open data file usr_ch\n");
+        exit(0);
+    }
+    // 遍历车辆链表
+    while(head != NULL)
+    {
+        // 格式化车辆入库时间
         char buffer[26]; // char类型，用于存储格式化后的日期和时间字符串
         struct tm * timeinfo;
-        timeinfo = localtime (&p->car.now_t); // 转换为分解时间表示
+        timeinfo = localtime (&head->car.now_t); // 转换为分解时间表示
         strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
-        printf("车牌号是%s \n车是%s来的\n车在%d区%d号\n\n", p->car.nm, buffer, p->car.wer.x, p->car.wer.y);
-        p = p->nxt;
+        
+        char s1[CHAR_LONG], s2[CHAR_LONG], s3[CHAR_LONG];
+        longlong_to_str(head->car.now_t, s1);
+        int_to_str(head->car.wer.x, s2);
+        int_to_str(head->car.wer.y, s3);
+
+        fprintf(fp, "%s %s %s %s\n", head->car.nm, s1, s2, s3);
+        if(!BOL)
+        printf("车牌号是%s \n车是%s来的\n车在%d区%d号\n\n", head->car.nm, buffer, head->car.wer.x, head->car.wer.y);
+        printf("车牌号是%s \n车是%s来的\n车在%s区%s号\n\n", head->car.nm, s1, s2, s3);
+
+        // 移动到下一个节点
+        head = head->nxt;
     }
+    fclose(fp);
 }
-int look_list_chang(bool* a)
+/// @brief 使用二维图形展示停车场
+/// @param a 
+/// @return 
+int Print_List_Chang(bool* a)
 {
     int b1 = 0, b2 = 0;
     for(int i = 0; i < c_num_qu; i++)
@@ -670,47 +874,55 @@ int look_list_chang(bool* a)
     return b2;
 }
 
-int read_f_num(FILE* fp)
+/// @brief 该函数用于将车辆信息写入文件，并打印停车位和入库时间
+/// @param car 停车场车辆链表
+/// @param change 
+void Chang_car(CAR* car, bool* change)
 {
-    char s[100];
-    int num=0;
-    fgets(s, 100, fp);
-    //printf("%s\t",s);
-    int n = strlen(s);
-    if(s[0] != '\n')
+    // 调用Fnd_chang函数找到一个可用的停车位
+    int index = Fnd_chang(change);
+    if(index != 0)
     {
-        //if(s[n-1]=='\n')n-=1;
-        //printf("thisis%d:\t",n);
-        for(int i=0; i <= n; i++, num *= 10)
+        // 更新车辆信息
+        car->wer.x = index / 10;
+        car->wer.y = index % 10;
+        time(&car->now_t);
+        // 打开文件
+        FILE* file = fopen(".\\data\\usr_ch", "a");
+        if(file == NULL) // 检查文件是否打开成功
         {
-            if(s[i] <= '9'&&s[i] >= '0')
-            {
-                num += (s[i]-'0');
-                //printf("the%dis%c\t",i,s[i]);
-            }
-            else num /= 10;
+            printf("Can not open data file system\n");
+            exit(0);
         }
-        num /= 10;
-    }
-    //printf("%d\n",num);
-    return num;
-}
-
-void Chang_car(CAR* p, bool* chang)
-{
-    int x = Fnd_chang(chang);
-    if(x != 0)
-    {
-        p->wer.x = x / 10;
-        p->wer.y = x % 10;
-        printf("你的车在%d区%d号停车位", p->wer.x, p->wer.y);
-        time(&p->now_t);
-        Read_C_Timt(&p->now_t);
+        // 将车辆信息写入文件
+        char s1[CHAR_LONG], s2[CHAR_LONG], s3[CHAR_LONG];
+        longlong_to_str(car->now_t, s1);
+        // long long time = car->now_t;
+        int_to_str(car->wer.x, s2);
+        int_to_str(car->wer.y, s3);
+        // int x = car->wer.x, y = car->wer.y;
+        fprintf(file, "%s %s %s %s\n", car->nm, s1, s2, s3);
+        // 关闭文件
+        fclose(file);
+        
+        // 打印停车位信息
+        printf("你的车在%d区%d号停车位\n", car->wer.x, car->wer.y);
+        
+        // 打印入库时间信息
+        struct tm * timeinfo;
+        timeinfo = localtime (&car->now_t);
+        char buffer[26];
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
+        printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
+        
         system("pause");
         return ;
     }
-    else puts("你的车没位置了");
-    return;
+    else 
+    {
+        puts("你的车没位置了");
+        return;
+    }
 }
 
 int Fnd_chang(bool* P)
