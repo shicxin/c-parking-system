@@ -1,7 +1,7 @@
 #ifndef __MESS_LIST__
 #define __MESS_LIST__
 
-#include<stdio.h>
+#include<stdbool.h>
 
 typedef struct MESS{
     char p_n[10]; //人名

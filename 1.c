@@ -5,6 +5,7 @@
 #include<time.h>
 
 #define PZ_NUM 7      //配置文件条目数量
+
 #define CHAR_LONG 20
 
 //DATA
@@ -19,7 +20,7 @@ int ten_mun; //十分钟的价钱
 int hfh_mun; //半小时的价钱
 int hou_mun; //一小时的价钱
 
-int p_num = 100; // 会员数量
+// int p_num = 100; // 会员数量
 
 
 typedef struct CAR{
@@ -29,6 +30,10 @@ typedef struct CAR{
         int x, y;
     }wer; //车辆位置
 }CAR;
+typedef struct CHA{
+    CAR car;
+    struct CHA* nxt;
+}CHA; //停车场
 
 typedef struct MESS{
     char p_n[10]; //人名```````
@@ -38,14 +43,9 @@ typedef struct MESS{
     struct MESS* nxt;
 }MESS; //账户
 
-typedef struct CHA{
-    CAR car;
-    struct CHA* nxt;
-}CHA; //停车场
-
-
 
 // DODODO
+
 int read_int(char*);
 double read_double(char*);
 long long read_longlong(char*);
@@ -55,32 +55,33 @@ void longlong_to_str(long long, char*);
 
 void init_sys(MESS*, CHA*, bool*); //初始化系统
 void Set_sys(); //设置系统
-
 void Init_Di_mess(FILE*, MESS*);//初始化用户
+
 bool CreateUser(MESS*, char*);//新建用户
 // MESS* Del_Di_chang(MESS*);//删除用户
 void Print_User_List(MESS*, bool);//遍历用户链表
-bool Fnd_di_chang_us_pnm(MESS*, char*);//使用用户名寻找用户
+MESS* Fnd_di_chang_us_pnm(MESS*, char*);//使用用户名寻找用户
 
 void Init_Di_car(FILE*, CHA*, bool*);//初始化停车场
 bool Mak_Di_car(CHA*, bool*);//模拟车来停车场
-bool Del_Di_car(CHA*, char*);//模拟车出停车场、、、、、、、、、、、、、、、、、、、、、
+bool Del_Di_car(CHA*, char*);//模拟车出停车场
 void Print_Car_List(CHA*, bool);//遍历停车场车信息
-bool Fnd_di_che_us_cnm(CHA* , char*);
+CHA* Fnd_di_che_us_cnm(CHA* , char*);
 void Chang_car(CAR*, bool*);//为新来的车分配车位
 int Fnd_chang(bool* P);//找到空车位，返回车位的抽象空间
 int Print_List_Chang(bool*);//遍历停车场场地信息
 
 bool Check_Login(); //密码判断，返回0或1；
+bool admin_admin();//登录界面
 void He_init(MESS*, CHA*, bool*); //hello界面
-
+void user_hole(MESS*);//有关用户的jianmian
 void Car_Com(CHA*, bool*); //车来了，需要车牌号，会为车牌号分配对应的停车位
 void Car_Out(CHA*, MESS*); //车走了
 void Car_Wer(CHA*); //车在哪
 
 int Read_Timt(time_t*);//读取时间，输出时间，返回与当前时间的差值
 // void Count_Money();//计算停车场盈利
-double Tran_Mony(time_t*);//出停车场结账
+double Tran_Mony(double);//出停车场结账
 
 
 int main()
@@ -137,6 +138,36 @@ void longlong_to_str(long long ll, char* s)
     sprintf(s, "%lld", ll); // 调用sprintf函数，将long long类型的值按照%lld的格式写入到s所指向的数组中
 }
 
+void user_hole(MESS* head)
+{
+    puts("**********************************");
+    puts("*************1.增加用户************");
+    puts("*************2.删除用户************");
+    puts("*************3.查询用户************");
+    puts("**********************************");
+
+    char c[CHAR_LONG];
+    scanf("%c", c);
+    if(strcmp(c, "1"))
+    {
+        puts("你的名字是");
+        scanf("%s", c);
+        CreateUser(head, c);
+    }
+    else if(strcmp(c, "2"))
+    {
+        puts("你的名字是");
+        scanf("%s", c);
+        Fnd_di_chang_us_pnm(head, c);
+    }
+    else if(strcmp(c, "3"))
+    {
+        puts("你的名字是");
+        scanf("%s", c);
+    }
+    else puts("输入不合法");
+    return;
+}
 
 /// @brief 从键盘读取一个字符串，并转换为一个int类型的值
 /// @return int
@@ -343,19 +374,25 @@ int Read_Timt(time_t* T)
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
     printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
     time_t now = time(NULL); // 获取当前时间
+    timeinfo = localtime(&now);
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
+    printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
     return difftime(now, *T); // 返回与当前时间的差值，单位是秒
 }
 
 // void Count_Money();
-double Tran_Mony(time_t* T)
+double Tran_Mony(double T)
 {
     int h, fh, m;
-    h = *T / (60 * 60);
-    fh = *T / 60 - h * 60;
+    h = T / (60 * 60);
+    fh = T / 60 - h * 60;
     m = fh - 30;
     fh /= 30;
     if(m < 0) m = 0;
-    else if(m > 10) fh++;
+    else if(m > 10) fh++, m = 0;
+    if(fh > 1) fh = 0, h++;
+
+    printf("您的停车时间相当于%d个一小时， %d个半小时，%d个十分钟\n", h, fh, m);
 
     return h * hou_mun + fh * hfh_mun + m * ten_mun;
 }
@@ -458,7 +495,9 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         printf("请选择程序功能：");
         scanf("%s",c);
         if(strcmp(c, "0") == 0)//结账
-        {}
+        {
+            user_hole(peo);
+        }
         else if(strcmp(c, "1") == 0)//车来
         {
             Car_Com(cha, P);
@@ -501,6 +540,13 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         }
     } 
 }
+
+bool admin_admin()
+{
+
+    return 1;
+}
+
 /// @brief  该函数用于检查用户输入的用户名和密码
 /// @return  是否正确
 bool Check_Login()
@@ -607,9 +653,8 @@ void Car_Out(CHA* q, MESS* p)
     char ma[10], nm[10];
     puts("你是：");
     scanf("%s", nm);
-    puts("你的密码是：");
-    scanf("%s", ma);
-    if(Fnd_di_chang_us_pnm(p, nm) == 0)
+    MESS* x = Fnd_di_chang_us_pnm(p, nm);
+    if(x == NULL)
     {
         puts("你要创建账号吗(创建为0，否则为1)：");
         bool key = 0;
@@ -625,16 +670,24 @@ void Car_Out(CHA* q, MESS* p)
             return ;
         }
     }
+    puts("你的密码是：");
+    scanf("%s", ma);
+    if(strcmp(ma, x->mima))
+    {
+        puts("密码错误");
+        return ;
+    }
     puts("车牌号是：");
-    CAR x;
-    scanf("%s", x.nm);
-    Del_Di_car(q, x.nm);
+    CAR xx;
+    scanf("%s", xx.nm);
+    Del_Di_car(x, q, xx.nm);
 }
+
 /// @brief 使用用户名寻找用户
 /// @param q 用户链表
 /// @param nm 用户名
 /// @return 是否找到
-bool Fnd_di_chang_us_pnm(MESS* q, char* nm)
+MESS* Fnd_di_chang_us_pnm(MESS* q, char* nm)
 {
     while(q->nxt != NULL && strcmp(q->nxt->p_n, nm)) 
     {
@@ -642,47 +695,47 @@ bool Fnd_di_chang_us_pnm(MESS* q, char* nm)
     }
     if(q->nxt != NULL && !strcmp(q->nxt->p_n, nm)) 
     {
-        return 1;
+        return q->nxt;
     }
-    return 0;
+    return NULL;
 }
 
 /// @brief 模拟车出停车场
 /// @param q 停车场现在停着的车
 /// @param nm 要出停车场的车
 /// @return 出停车场是否成功
-bool Del_Di_car(CHA* k, char* nm)
+bool Del_Di_car(MESS*peo, CHA* k, char* nm)
 {
     if(k == NULL) // 没有停车
     {
         puts("停车场内没有车");
         return 0;
     }
-    
     CHA* p = k; // 用一个临时变量来遍历链表
     while(p->nxt != NULL && strcmp(p->nxt->car.nm, nm)) // 找到要出库的车辆或者到达链表尾部
     {
         p = p->nxt;
     }
-    
-    if(p->nxt != NULL && !strcmp(p->nxt->car.nm, nm)) // 找到了要出库的车辆
+    if(p->nxt != NULL && strcmp(p->nxt->car.nm, nm) == 0) // 找到了要出库的车辆
     {
-        double vue;
-        Read_Timt(&p->nxt->car.now_t); // 计算停车时间
-        struct tm * timeinfo;
-        timeinfo = localtime (&p->nxt->car.now_t);
-        char buffer[26];
-        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
-        printf("TIME_T的数据为%lld\n", p->nxt->car.now_t);
-        // printf("车辆入库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
-        time_t now = time(NULL); // 获取当前时间
-        timeinfo = localtime (&now);
-
-        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
-        printf("车辆出库时间为: %s\n", buffer); //打印格式化的日期和时间字符串
-
-        vue = Tran_Mony(&p->nxt->car.now_t); // 计算停车费用
-        printf("总金额为：%.02lf", vue);
+        // puts("找到了");
+        double vue, vv;
+        vv = Read_Timt(&p->nxt->car.now_t); // 计算停车时间
+        vue = Tran_Mony(vv); // 计算停车费用
+        printf("总金额为：%.02lf\n", vue);
+        printf("你卡里还有：%.02lf,是否进行充值？(默认N，y/Y/1为充值)", peo->vue);
+        char s[CHAR_LONG];
+        scanf("%s", s);
+        if(strcmp(s, "y") == 0 || strcmp(s, "Y") == 0 || strcmp(s, "1") == 0)
+        {
+            puts("请输入充值金额");
+            scanf("%s", s);
+            peo->vue += 
+        }
+        if(vue < peo->vue)
+        {
+            puts("钱不够！");
+        }
         CHA* car = p->nxt;
         p->nxt = car->nxt; // 从链表中删除出库的车辆
         free(car); // 释放内存
@@ -691,17 +744,17 @@ bool Del_Di_car(CHA* k, char* nm)
     }
     else // 没有找到要出库的车辆
     {
-        puts("没出去");
+        puts("没有找到要出库的车辆");
         return 0;
     }
 }
 
-bool Fnd_di_che_us_cnm(CHA* q, char* nm)
+CHA* Fnd_di_che_us_cnm(CHA* q, char* nm)
 {
     if(strcmp(q->car.nm, nm) == 0) 
     {
         printf("你的车在%d区的%d号停车位上\n", q->car.wer.x, q->car.wer.y);
-        return 1;
+        return q;
     }
     else 
     {
@@ -712,10 +765,10 @@ bool Fnd_di_che_us_cnm(CHA* q, char* nm)
         if(q->nxt != NULL && !strcmp(q->nxt->car.nm, nm)) 
         {
             printf("你的车在%d区的%d号停车位上\n", q->nxt->car.wer.x, q->nxt->car.wer.y);
-            return 1;
+            return q->nxt;
         }
     }
-    return 0;
+    return NULL;
 }
 
 void Car_Wer(CHA* q)
@@ -723,7 +776,7 @@ void Car_Wer(CHA* q)
     char s[10];
     puts("你的车牌号是：");
     scanf("%s", s);
-    if( Fnd_di_che_us_cnm(q, s) == 0)
+    if( Fnd_di_che_us_cnm(q, s) == NULL)
     {
         puts("你的车不在车库");
     }
@@ -754,7 +807,7 @@ bool CreateUser(MESS* head, char * name)
         if(strcmp(password, confirm) == 0) 
         {
             match = 1;
-            puts("密码修改成功");
+            puts("设置密码成功");
         }
         else 
         {
@@ -766,9 +819,10 @@ bool CreateUser(MESS* head, char * name)
     strcpy(node->mima, password);
     node->V = 0;
     node->vue = 0;
-
     printf("你想充值多少：");
-    scanf("%llf", &node->vue);
+    char s1[CHAR_LONG], s2[CHAR_LONG];
+    scanf("%s", s1);
+    node->vue = read_double(s1);
     printf("你的密码是%s，账户金额为%.2lf", node->mima, node->vue);
     // 打开文件
     FILE* p_mess;
@@ -779,7 +833,6 @@ bool CreateUser(MESS* head, char * name)
     }
 
     // 将用户信息写入文件
-    char s1[CHAR_LONG], s2[CHAR_LONG];
     double_to_str(node->vue, s1);
     int_to_str(node->V, s2);
     fprintf(p_mess, "%s %s %s %s", node->p_n, node->mima, s1, s2);
@@ -820,6 +873,7 @@ void Print_User_List(MESS* head, bool BOL)
     }
     fclose(fp);
 }
+
 /// @brief 遍历停车场车信息
 /// @param head 停车场现有的车辆信息
 /// @param BOL 判断是否打印到命令行
@@ -848,7 +902,6 @@ void Print_Car_List(CHA* head, bool BOL)
         fprintf(fp, "%s %s %s %s\n", head->car.nm, s1, s2, s3);
         if(!BOL)
         printf("车牌号是%s \n车是%s来的\n车在%d区%d号\n\n", head->car.nm, buffer, head->car.wer.x, head->car.wer.y);
-        printf("车牌号是%s \n车是%s来的\n车在%s区%s号\n\n", head->car.nm, s1, s2, s3);
 
         // 移动到下一个节点
         head = head->nxt;
@@ -865,7 +918,7 @@ int Print_List_Chang(bool* a)
     {
         for(int j = 0; j < c_num_lang; j++)
         {
-            printf(a[i * c_num_lang + j] == 1 ? "* " : "# ");
+            printf(a[i * c_num_lang + j] == 1 ? "# " : "* ");
             a[i * c_num_lang + j] == 1 ? b1++ : b2++;
         }
         printf("\n");
@@ -927,7 +980,7 @@ void Chang_car(CAR* car, bool* change)
 
 int Fnd_chang(bool* P)
 {
-    for(int i = 1; i <= 100; i++)
+    for(int i = 0; i <= 100; i++)
     {
         if(P[i] == 0)
         {
