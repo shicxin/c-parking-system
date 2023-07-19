@@ -446,8 +446,40 @@ int Read_Timt(time_t* T)
 /// @param T 秒数
 void Count_Money(long long T)
 {
-    // 获取当前时间
+    T = T * 24 * 60 * 60;
+    long long now = time(NULL);// 获取当前时间
+    now -= T;
     // 往前推T秒，找到最早时间
+    struct tm * timeinfo;
+    timeinfo = localtime(&now);
+    char buffer[26];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // 将日期和时间格式化为字符串
+    printf("将查找从 %s开始到现在的账单\n", buffer);
+
+    FILE* fp;
+    if((fp = open(".\\data\\money", "a")) == NULL)
+    {
+        puts("Can not open data file money");
+        return;
+    }
+
+    WTD wtd;
+    int a, ans = 0, sum = 0;
+    // char s1[CHAR_SIZE], s2[CHAR_SIZE], s3[CHAR_SIZE], s4[CHAR_SIZE];
+    while(fscanf(fp, "%s %s %d %s", wtd.time, wtd.DO.nm, a, wtd.DO.ADD) != EOF)
+    {
+        
+        time_t time = read_longlong(wtd.time);
+        if(time < now)continue;
+        timeinfo = localtime(&time);
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+        int add = read_double(wtd.DO.ADD);
+        if(add < 0)ans += add;
+        else sum += add;
+    }
+    printf("停车场一共收入%.2llf元，其中净利润为%.2llf元", -ans/2, sum);
+
+    fclose(fp);
     // 打开文件读取时间大于最小时间的交易额
     // 使用两个变量记录，实际盈利与停车场账户金额
 }
@@ -613,6 +645,16 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         else if(strcmp(c, "7") == 0)
         {
             Print_Car_List(cha, 0);
+            system("pause");
+        }
+        else if(strcmp(c, "8") == 0)
+        {
+            long long t = Now_Time();
+            printf("请输入想查看多少天前至今的账单\n     天\b\b\b\b");
+            char t[20];
+            scanf("%s", t);
+            int T = read_int(t);
+            Count_Money(T);
             system("pause");
         }
         else if(strcmp(c, "10") == 0)
