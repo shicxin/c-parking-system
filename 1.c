@@ -68,7 +68,9 @@ void init_sys(MESS*, CHA*, bool*); //初始化系统
 void Set_sys(); //设置系统
 void Init_Di_mess(FILE*, MESS*);//初始化用户
 
-MESS* CreateUser(MESS*, char*);//新建用户
+MESS* Create_User(MESS*, char*);//新建用户
+bool Del_User(MESS*, char*);//删除用户
+bool Vue_User(MESS*, char*);//充值用户
 void Print_User_List(MESS*, bool);//遍历用户链表
 MESS* Fnd_di_chang_us_pnm(MESS*, char*);//使用用户名寻找用户
 
@@ -84,7 +86,7 @@ int Print_List_Chang(bool*);//遍历停车场场地信息
 bool Check_Login(); //密码判断，返回0或1；
 bool admin_admin();//登录界面
 void He_init(MESS*, CHA*, bool*); //hello界面
-void user_hole(MESS*);//有关用户的jianmian
+void user_hole(MESS*);//用户功能界面
 void Car_Com(CHA*, bool*); //车来了，需要车牌号，会为车牌号分配对应的停车位
 void Car_Out(CHA*, MESS*); //车走了
 void Car_Wer(CHA*); //车在哪
@@ -193,8 +195,8 @@ void user_hole(MESS* head)
 {
     puts("**********************************");
     puts("*************1.增加用户************");
-    puts("*************2.删除用户************");
-    puts("*************3.查询用户************");
+    puts("*************2.用户销户************");
+    puts("*************3.用户充值************");
     puts("**********************************");
 
     char c[CHAR_SIZE];
@@ -203,19 +205,19 @@ void user_hole(MESS* head)
     {
         puts("你的名字是");
         scanf("%s", c);
-        CreateUser(head, c);
+        Create_User(head, c);
     }
     else if(strcmp(c, "2"))
     {
         puts("你的名字是");
         scanf("%s", c);
-        Fnd_di_chang_us_pnm(head, c);
+        Del_User(head, c);
     }
     else if(strcmp(c, "3"))
     {
         puts("你的名字是");
         scanf("%s", c);
-        Fnd_di_chang_us_pnm(head, c);
+        Vue_User(head, c);
     }
     else puts("输入不合法");
     return;
@@ -716,7 +718,7 @@ void Car_Out(CHA* car, MESS* peo)
         scanf("%d", &key);
         if(key == 0)
         {
-            x = CreateUser(p, nm);
+            x = Create_User(p, nm);
             printf("你的密码是%s\n", x->mima);
             printf("账号金额为%.2lf\n", x->vue);
         }
@@ -776,6 +778,38 @@ bool Del_Di_car(MESS*peo, CHA* k, char* nm)
         return 0;
     }
     CHA* p = k; // 用一个临时变量来遍历链表
+    if(strcmp(p->car.nm, nm) == 0)
+    {
+        double vue;
+        vue = Read_Timt(&p->car.now_t);
+        vue = Tran_Mony(vue);
+        printf("总金额为：%.02lf\n", vue);
+        printf("你卡里还有：%.02lf,是否进行充值？(默认N，y/Y/1为充值)", peo->vue);
+        char s[CHAR_SIZE];
+        scanf("%s", s);
+        if(strcmp(s, "y") == 0 || strcmp(s, "Y") == 0 || strcmp(s, "1") == 0)
+        {
+            puts("请输入充值金额");
+            scanf("%s", s);
+            peo->vue += read_int(s);
+            Use_WTAD(time(NULL), peo->p_n, 0, vue);
+        }
+        if(vue > peo->vue)
+        {
+            puts("钱不够！");
+            puts("没有出场！！！");
+            return 0;
+        }
+        else
+        {
+            peo->vue -= vue;
+        }
+        free(p); // 释放内存
+        Use_WTAD(time(NULL), nm, 1, -vue);//记录操作
+        Use_WTAD(time(NULL),peo->p_n, 0, -vue);//记录操作
+        printf("你现在还有%.2lf块\n", peo->vue);
+        puts("车出停车场了！");
+    }
     while(p->nxt != NULL && strcmp(p->nxt->car.nm, nm)) // 找到要出库的车辆或者到达链表尾部
     {
         p = p->nxt;
@@ -864,7 +898,7 @@ void Car_Wer(CHA* q)
 /// @param head 用户链表
 /// @param name 用户名
 /// @return 新建成功
-MESS* CreateUser(MESS* head, char * name)
+MESS* Create_User(MESS* head, char * name)
 {
     MESS* node;
     // 分配内存空间
@@ -923,6 +957,46 @@ MESS* CreateUser(MESS* head, char * name)
     // printf("你的密码是%s，账户金额为%.2lf\n", node->mima, node->vue);
     
     return node;
+}
+
+/// @brief 删除用户
+/// @param head 头结点
+/// @param nm 删除人姓名
+/// @return 删除是否成功
+bool Del_User(MESS* head, char* nm)
+{
+    if(head == NULL) return 0;
+    if(strcmp(head->p_n, nm) == 0)
+    {
+        printf("一共返还金额%.2lf元", head->vue);
+        free(head);
+        return 1;
+    }
+    while(head->nxt != NULL && strcmp(head->p_n, nm) != 0)
+    {
+        head = head->nxt;
+    }
+    if(head->nxt != NULL && strcmp(head->p_n, nm) == 0)
+    {
+        printf("一共返还金额%.2lf元", head->vue);
+        MESS* x = head->nxt;
+        head->nxt = x->nxt;
+        free(x);
+        return 1;
+    }
+    return 0;
+}
+
+/// @brief 充值功能
+/// @param head 用户链表
+/// @param nm 充值人姓名
+/// @return 充值是否成功
+bool Vue_User(MESS* head, char* nm)
+{
+    MESS* x = Fnd_di_chang_us_pnm(head, nm);
+    puts("你想充值多少：");
+    int vue = 0;
+    scanf("%d", &vue);
 }
 
 /// @brief 遍历用户信息

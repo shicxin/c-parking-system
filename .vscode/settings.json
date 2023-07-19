@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "mak_list.h": "c"
+        "mak_list.h": "c",
+        "cjson.h": "c"
     }
 }
