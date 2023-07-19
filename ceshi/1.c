@@ -4,17 +4,17 @@
 // // //     FILE *file;
 // // //     char buffer[1024];
 
-// // //     file = fopen("123", "r"); // ä»¥åªè¯»æ–¹å¼æ‰“å¼€æ–‡ä»¶
+// // //     file = fopen("123", "r"); // ÒÔÖ»¶Á·½Ê½´ò¿ªÎÄ¼ş
 // // //     if (file == NULL) {
-// // //         printf("æ— æ³•æ‰“å¼€æ–‡ä»¶\n");
+// // //         printf("ÎŞ·¨´ò¿ªÎÄ¼ş\n");
 // // //         return 1;
 // // //     }
 
-// // //     while (fgets(buffer, sizeof(buffer), file) != NULL) { // å¾ªç¯è¯»å–æ–‡ä»¶å†…å®¹
-// // //         printf("%s", buffer); // è¾“å‡ºæ¯ä¸€è¡Œçš„å†…å®¹
+// // //     while (fgets(buffer, sizeof(buffer), file) != NULL) { // Ñ­»·¶ÁÈ¡ÎÄ¼şÄÚÈİ
+// // //         printf("%s", buffer); // Êä³öÃ¿Ò»ĞĞµÄÄÚÈİ
 // // //     }
 
-// // //     fclose(file); // å…³é—­æ–‡ä»¶
+// // //     fclose(file); // ¹Ø±ÕÎÄ¼ş
 // // //     return 0;
 // // // }
 // // #include <stdio.h>
@@ -25,16 +25,16 @@
 // //     int a, b, c;
 // //     float d;
 
-// //     file = fopen("123", "r"); // ä»¥åªè¯»æ–¹å¼æ‰“å¼€æ–‡ä»¶
+// //     file = fopen("123", "r"); // ÒÔÖ»¶Á·½Ê½´ò¿ªÎÄ¼ş
 // //     if (file == NULL) {
-// //         printf("æ— æ³•æ‰“å¼€æ–‡ä»¶\n");
+// //         printf("ÎŞ·¨´ò¿ªÎÄ¼ş\n");
 // //         return 1;
 // //     }
 // //     char s[10];
-// //     fscanf(file, "%s %d", s, &a); // è¯»å–å››ä¸ªæ•´æ•°å’Œä¸€ä¸ªæµ®ç‚¹æ•°
-// //     fclose(file); // å…³é—­æ–‡ä»¶
+// //     fscanf(file, "%s %d", s, &a); // ¶ÁÈ¡ËÄ¸öÕûÊıºÍÒ»¸ö¸¡µãÊı
+// //     fclose(file); // ¹Ø±ÕÎÄ¼ş
 
-// //     printf("%s %d\n", s, a); // è¾“å‡ºè¯»å–çš„æ•°æ®
+// //     printf("%s %d\n", s, a); // Êä³ö¶ÁÈ¡µÄÊı¾İ
 
 // //     return 0;
 // // }
@@ -44,24 +44,24 @@
 // #include <time.h>
 
 // int main() {
-//     time_t rawtime; // time_tç±»å‹ï¼Œè¡¨ç¤ºè‡ª1970å¹´1æœˆ1æ—¥ä»¥æ¥çš„ç§’æ•°
-//     struct tm * timeinfo; // struct tmç±»å‹ï¼Œç”¨äºå­˜å‚¨æ—¥æœŸå’Œæ—¶é—´çš„ç»“æ„ä½“
-//     int seconds; // intç±»å‹ï¼Œè¡¨ç¤ºå½“å‰æ—¶é—´è·ç¦»1970å¹´1æœˆ1æ—¥çš„ç§’æ•°
-//     char buffer[26]; // charç±»å‹ï¼Œç”¨äºå­˜å‚¨æ ¼å¼åŒ–åçš„æ—¥æœŸå’Œæ—¶é—´å­—ç¬¦ä¸²
+//     time_t rawtime; // time_tÀàĞÍ£¬±íÊ¾×Ô1970Äê1ÔÂ1ÈÕÒÔÀ´µÄÃëÊı
+//     struct tm * timeinfo; // struct tmÀàĞÍ£¬ÓÃÓÚ´æ´¢ÈÕÆÚºÍÊ±¼äµÄ½á¹¹Ìå
+//     int seconds; // intÀàĞÍ£¬±íÊ¾µ±Ç°Ê±¼ä¾àÀë1970Äê1ÔÂ1ÈÕµÄÃëÊı
+//     char buffer[26]; // charÀàĞÍ£¬ÓÃÓÚ´æ´¢¸ñÊ½»¯ºóµÄÈÕÆÚºÍÊ±¼ä×Ö·û´®
 
-//     // time (&rawtime); // è·å–è‡ªepochä»¥æ¥çš„ç§’æ•°
+//     // time (&rawtime); // »ñÈ¡×ÔepochÒÔÀ´µÄÃëÊı
     
 //     FILE* fp = NULL;
 //     fp = fopen("sys", "r");
 //     fscanf(fp, "%lld", &rawtime);
 
 
-//     timeinfo = localtime (&rawtime); // è½¬æ¢ä¸ºåˆ†è§£æ—¶é—´è¡¨ç¤º
-//     seconds = difftime(time(NULL), rawtime); // ä»¥ç§’ä¸ºå•ä½è·å–nowå’Œepochä¹‹é—´çš„å·®å€¼
-//     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // å°†æ—¥æœŸå’Œæ—¶é—´æ ¼å¼åŒ–ä¸ºå­—ç¬¦ä¸²
+//     timeinfo = localtime (&rawtime); // ×ª»»Îª·Ö½âÊ±¼ä±íÊ¾
+//     seconds = difftime(time(NULL), rawtime); // ÒÔÃëÎªµ¥Î»»ñÈ¡nowºÍepochÖ®¼äµÄ²îÖµ
+//     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo); // ½«ÈÕÆÚºÍÊ±¼ä¸ñÊ½»¯Îª×Ö·û´®
 
-//     printf("Current time: %s\n", buffer); //æ‰“å°æ ¼å¼åŒ–çš„æ—¥æœŸå’Œæ—¶é—´å­—ç¬¦ä¸²
-//     printf("Time since epoch: %d seconds\n", seconds); // ä»¥ç§’ä¸ºå•ä½æ‰“å°nowå’Œepochä¹‹é—´çš„å·®å€¼
+//     printf("Current time: %s\n", buffer); //´òÓ¡¸ñÊ½»¯µÄÈÕÆÚºÍÊ±¼ä×Ö·û´®
+//     printf("Time since epoch: %d seconds\n", seconds); // ÒÔÃëÎªµ¥Î»´òÓ¡nowºÍepochÖ®¼äµÄ²îÖµ
 //     return 0;
 // }
 
@@ -100,28 +100,89 @@
 // //     return 0;
 // // }
 
-
+///7.19×÷Òµ///////////////////////////////////////
 #include<stdio.h>
 #include<string.h>
-
-int add(int a, int b);
-int subtract(int a, int b);
-
-int main()
-{
-    int (*p_array[2])(int, int); // å®šä¹‰ä¸€ä¸ªåŒ…å«ä¸¤ä¸ªå‡½æ•°æŒ‡é’ˆçš„å‡½æ•°æŒ‡é’ˆæ•°ç»„
-
-    p_array[0] = add; // å°†å‡½æ•°æŒ‡é’ˆæ•°ç»„ä¸­çš„ç¬¬ä¸€ä¸ªå…ƒç´ è®¾ç½®ä¸ºaddå‡½æ•°æŒ‡é’ˆ
-    p_array[1] = subtract; // å°†å‡½æ•°æŒ‡é’ˆæ•°ç»„ä¸­çš„ç¬¬äºŒä¸ªå…ƒç´ è®¾ç½®ä¸ºsubtractå‡½æ•°æŒ‡é’ˆ
-}
+#include<stdlib.h>
 
 int S_To_I(char *x)
 {
     int v = 0;
     int n = strlen(x);
-    for(int i = 0; i < n; i++, v*=10)
+    for(int i = 0; i < n; i++)
     {
-        v += x[i] - '0';
+        v*=10;
+        v += (x[i] - '0');
     }
-    return v/10;
+    return v;
+}
+
+void Long_S(char* s)
+{
+    char c = s[0];
+    int ma = 1, tm = 1;
+    for(int i = 1; i < strlen(s); i++)
+    {
+        if(c == s[i]) 
+        {
+            tm++;
+            ma = ma > tm ? ma : tm;
+        }
+        else 
+        {
+            c = s[i];
+            tm = 1;
+        }
+    }
+    printf("×î³¤µÄÁ¬Ğø×Ö·ûÎª£º%d\n", ma);
+}
+
+void Del_S_U_S(char* p, char* q)
+{
+    for(int i = 0; i < strlen(p); i++)
+    {
+        if(p[i] == q[0])
+        {
+            int key = 0;
+            for(int j = 1; j < strlen(q) && key == 0; j++)
+            {
+                if(p[i + j] != q[j]) key = 1;
+            }
+            if(key == 0)
+            {
+                for(int j = 0; j < strlen(q); j++)
+                {
+                    p[i + j] = ' ';
+                }
+            }
+        }
+    }
+    char* xy;
+    int j = 0;
+    xy = (char*)malloc(sizeof(p));
+    for(int i = 0; i < strlen(p); i++)
+    {
+        if(p[i] != ' ')xy[j++] = p[i];
+    }
+    printf("É¾³ıºó×Ö·û´®Îª%s", xy);
+}
+
+int main()
+{
+    char c[100];
+    printf("²âÊÔ¹¦ÄÜ1£¬×Ö·û´®×ªÕûÊı£¬ÇëÊäÈëÒ»¸ö×Ö·û´®");
+    scanf("%s", c);
+    int x = S_To_I(c);
+    printf("×ª»»ºóÎª%d\n", x);
+    printf("²âÊÔ¹¦ÄÜ2£¬ÕÒµ½×î³¤µÄ×Ó´®£¬ÇëÊäÈëÒ»¸ö×Ö·û´®");
+    scanf("%s", c);
+    Long_S(c);
+    // printf("×ª»»ºóÎª%d\n", x);
+    printf("²âÊÔ¹¦ÄÜ3£¬×Ö·û´®É¾³ıÒ»¸ö×Ö·û´®£¬ÇëÊäÈëÒ»¸ö×Ö·û´®");
+    scanf("%s", c);
+    printf("²âÊÔ¹¦ÄÜ3£¬×Ö·û´®É¾³ıÒ»¸ö×Ö·û´®£¬ÇëÊäÉ¾³ıµÄ×Ö·û´®");
+    char s[20];
+    scanf("%s", s);
+    // int x = S_To_I(c);
+    Del_S_U_S(c, s);
 }

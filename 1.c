@@ -3,6 +3,7 @@
 #include<string.h>
 #include<stdbool.h>
 #include<time.h>
+#include<ctype.h>
 
 #define PZ_NUM 7      //配置文件条目数量
 
@@ -93,7 +94,7 @@ void Car_Wer(CHA*); //车在哪
 
 int Read_Timt(time_t*);//读取时间，输出时间，返回与当前时间的差值
 long long Now_Time();
-// void Count_Money();//计算停车场盈利
+void Count_Money(long long);//计算停车场盈利
 double Tran_Mony(double);//出停车场结账
 
 
@@ -201,19 +202,19 @@ void user_hole(MESS* head)
 
     char c[CHAR_SIZE];
     scanf("%s", c);
-    if(strcmp(c, "1"))
+    if(strcmp(c, "1") == 0)
     {
         puts("你的名字是");
         scanf("%s", c);
         Create_User(head, c);
     }
-    else if(strcmp(c, "2"))
+    else if(strcmp(c, "2") == 0)
     {
         puts("你的名字是");
         scanf("%s", c);
         Del_User(head, c);
     }
-    else if(strcmp(c, "3"))
+    else if(strcmp(c, "3") == 0)
     {
         puts("你的名字是");
         scanf("%s", c);
@@ -372,6 +373,19 @@ void Set_sys()
             printf("需要改为：");
             char s[CHAR_SIZE];
             scanf("%s", s);
+            for(int j = 0; j < strlen(s); j++)
+            {
+                if(!isalpha(s[j])) 
+                {
+                    puts("输入不合法！！！");
+                    while(i < 6)//将剩余内容写入文件，以防丢失
+                    {
+                        fprintf(fp, "%s  %d \n",a[i], num[i] );
+                        i++;
+                    }
+                    return ;
+                }
+            }
             num[i] = read_int(s);
             k[0] = 'O';
         }
@@ -381,6 +395,7 @@ void Set_sys()
     }
     fclose(fp);
 }
+
 /// @brief 初始化用户
 /// @param fp 用户配置文件
 /// @param q 用户链表
@@ -407,6 +422,7 @@ void Init_Di_mess(FILE* fp, MESS* q)
     }
     return ;
 }
+
 /// @brief 读取时间
 /// @param T 需要翻译的time_t
 /// @return 需要翻译的时间与当前的时间差秒数，如果T为空指针，则返回-1
@@ -426,6 +442,16 @@ int Read_Timt(time_t* T)
     return difftime(now, *T); // 返回与当前时间的差值，单位是秒
 }
 
+/// @brief 计算前T秒中停车场的盈利
+/// @param T 秒数
+void Count_Money(long long T)
+{
+    // 获取当前时间
+    // 往前推T秒，找到最早时间
+    // 打开文件读取时间大于最小时间的交易额
+    // 使用两个变量记录，实际盈利与停车场账户金额
+}
+
 /// @brief 输出并返回当前时间
 /// @return 返回时间戳
 long long Now_Time()
@@ -439,7 +465,7 @@ long long Now_Time()
     return now;
 }
 
-// void Count_Money();
+/// void Count_Money();
 double Tran_Mony(double T)
 {
     int h, fh, m;
@@ -455,6 +481,7 @@ double Tran_Mony(double T)
 
     return h * hou_mun + fh * hfh_mun + m * ten_mun;
 }
+
 /// @brief 登录界面与选项界面
 /// @param peo 用户链表
 /// @param cha 车链表
@@ -547,6 +574,7 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         puts("*************5.退出程序***********");
         puts("*************6.查看用户***********");
         puts("*************7.查看车辆***********");
+        puts("*************8.查看收支***********");
         puts("**********************************");
         puts("************10.配置系统***********");
         puts("**********************************");
@@ -680,6 +708,7 @@ void Init_Di_car(FILE* fp, CHA* cha, bool* P)
 
     return ;
 }
+
 /// @brief 模拟车来停车场
 /// @param q 停车场车辆链表
 /// @param P 一维数组模拟的停车场
@@ -856,6 +885,7 @@ bool Del_Di_car(MESS*peo, CHA* k, char* nm)
         return 0;
     }
 }
+
 /// @brief 使用车牌号找到停车场的车
 /// @param q 停车场链表
 /// @param nm 车牌号
@@ -933,6 +963,14 @@ MESS* Create_User(MESS* head, char * name)
     printf("你想充值多少：");
     char s1[CHAR_SIZE], s2[CHAR_SIZE];
     scanf("%s", s1);
+    for(int j = 0; j < strlen(s1); j++)
+    {
+        if(!isalpha(s1[j])) 
+        {
+            puts("输入不合法！！！");
+            return NULL;
+        }
+    }
     node->vue = read_double(s1);
     Use_WTAD(time(NULL), name, 0, node->vue);//记录操作
     // 打开文件
@@ -1060,6 +1098,7 @@ void Print_Car_List(CHA* head, bool BOL)
     }
     fclose(fp);
 }
+
 /// @brief 使用二维图形展示停车场
 /// @param a 
 /// @return 
@@ -1132,6 +1171,7 @@ void Chang_car(CAR* car, bool* change)
         return;
     }
 }
+
 /// @brief 找到空车位
 /// @param P 停车场抽象数组
 /// @return 位置 X*Y
@@ -1147,4 +1187,3 @@ int Fnd_chang(bool* P)
     }
     return -1;
 }
-
