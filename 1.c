@@ -447,7 +447,7 @@ int Read_Timt(time_t* T)
 void Count_Money(long long T)
 {
     T = T * 24 * 60 * 60;
-    long long now = time(NULL);// 获取当前时间
+    time_t now = time(NULL);// 获取当前时间
     now -= T;
     // 往前推T秒，找到最早时间
     struct tm * timeinfo;
@@ -457,7 +457,7 @@ void Count_Money(long long T)
     printf("将查找从 %s开始到现在的账单\n", buffer);
 
     FILE* fp;
-    if((fp = open(".\\data\\money", "a")) == NULL)
+    if((fp = fopen(".\\data\\money", "a")) == NULL)
     {
         puts("Can not open data file money");
         return;
@@ -651,9 +651,9 @@ void He_init(MESS* peo, CHA* cha, bool* P)
         {
             long long t = Now_Time();
             printf("请输入想查看多少天前至今的账单\n     天\b\b\b\b");
-            char t[20];
-            scanf("%s", t);
-            int T = read_int(t);
+            char s[CHAR_SIZE];
+            scanf("%s", s);
+            int T = read_int(s);
             Count_Money(T);
             system("pause");
         }
